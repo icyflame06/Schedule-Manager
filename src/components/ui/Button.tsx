@@ -16,10 +16,10 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center font-medium rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none cursor-pointer",
+        "inline-flex items-center justify-center font-bold rounded-full transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none cursor-pointer",
         {
-          // Primary: sleeker gradient styling
-          "bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:shadow-indigo-400/10":
+          // Primary: solid high-contrast
+          "bg-[var(--primary)] hover:bg-[#e0a800] text-black border border-black shadow-sm dark:border-zinc-800":
             variant === "primary",
           // Secondary: flat muted
           "bg-slate-200/50 hover:bg-slate-200/80 text-slate-900 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 dark:text-zinc-100":

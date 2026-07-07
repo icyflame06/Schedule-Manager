@@ -29,44 +29,24 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-screen flex flex-col justify-between overflow-hidden">
-      {/* Dynamic Background Gradients */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/10 blur-[120px] dark:bg-indigo-500/20" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-emerald-500/10 blur-[120px] dark:bg-emerald-500/20" />
+      {/* Dynamic Background Gradients (Removed for flat theme) */}
 
       {/* Header */}
       <header className="relative w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between z-10">
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-all">
-            C
+          <div className="w-10 h-10 rounded-full bg-[var(--primary)] flex items-center justify-center text-black font-bold text-xl shadow-lg border border-black group-hover:scale-105 transition-all">
+            P
           </div>
-          <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 bg-clip-text text-transparent dark:from-white dark:via-indigo-200 dark:to-white">
-            Chronos
+          <span className="font-bold text-xl tracking-tight text-slate-900 dark:text-white">
+            Palsa
           </span>
         </Link>
 
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleTheme}
-            className="p-2.5 rounded-xl"
-          >
-            {theme === "light" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-          </Button>
-
-          {user ? (
+          {user && (
             <Link href="/dashboard">
               <Button size="sm">Go to Dashboard</Button>
             </Link>
-          ) : (
-            <div className="flex gap-2">
-              <Button size="sm" variant="ghost" onClick={handleGoogleAccess}>
-                Google Sign In
-              </Button>
-              <Button size="sm" onClick={handleDemoAccess}>
-                Demo Access
-              </Button>
-            </div>
           )}
         </div>
       </header>
@@ -85,10 +65,10 @@ export default function LandingPage() {
 
           <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-[1.1] max-w-4xl text-slate-900 dark:text-white">
             Schedule meetings with a{" "}
-            <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 dark:from-indigo-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent bg-[length:200%_auto] animate-pulse">
-              premium glassmorphic
+            <span className="text-[var(--primary)]">
+              premium booking
             </span>{" "}
-            interface.
+            experience.
           </h1>
 
           <p className="text-lg text-slate-600 dark:text-zinc-400 max-w-2xl mt-2 leading-relaxed">
@@ -96,13 +76,12 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 mt-6">
-            <Button size="lg" onClick={handleGoogleAccess} className="group pr-5">
-              Continue with Google{" "}
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button variant="secondary" size="lg" onClick={handleDemoAccess}>
-              Playground Demo
-            </Button>
+            <Link href="/book/icyflame06j8e">
+              <Button size="lg" className="group pr-5">
+                Book a Slot{" "}
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
           </div>
         </motion.div>
 
@@ -166,59 +145,61 @@ export default function LandingPage() {
       </main>
 
       {/* Features Grid */}
-      <section id="features" className="relative w-full max-w-7xl mx-auto px-6 py-24 z-10 border-t border-border/20">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Designed for seamless, frictionless bookings
-          </h2>
-          <p className="text-slate-600 dark:text-zinc-400 mt-3 max-w-lg mx-auto">
-            Everything you need in a modern meeting platform, optimized for conversion and speed.
-          </p>
-        </div>
+      <section id="features" className="relative w-full bg-black text-white px-6 py-24 z-10">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold tracking-tight">
+              Global Recognition
+            </h2>
+            <p className="text-zinc-400 mt-3 max-w-lg mx-auto">
+              Everything you need in a modern meeting platform, optimized for conversion and speed.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            {
-              icon: Clock,
-              title: "Meeting Types",
-              desc: "Configure 15m, 30m, 60m, or fully customized events with setup locations.",
-            },
-            {
-              icon: Globe,
-              title: "Timezone Conversion",
-              desc: "Detect guest timezones automatically and display host availability seamlessly.",
-            },
-            {
-              icon: Video,
-              title: "Meet Link Generation",
-              desc: "Create and attach unique Google Meet links automatically to booked calendars.",
-            },
-            {
-              icon: Shield,
-              title: "Premium Glassmorphism",
-              desc: "Experience fully interactive frosted-glass designs, premium dark modes, and cards.",
-            },
-          ].map((feat, index) => (
-            <Card key={index} variant="glass-interactive" className="p-6 flex flex-col justify-between h-56">
-              <div className="w-12 h-12 rounded-xl bg-indigo-500/10 dark:bg-indigo-400/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-inner">
-                <feat.icon className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg text-slate-900 dark:text-white mb-2">
-                  {feat.title}
-                </h3>
-                <p className="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed">
-                  {feat.desc}
-                </p>
-              </div>
-            </Card>
-          ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                icon: Clock,
+                title: "Meeting Types",
+                desc: "Configure 15m, 30m, 60m, or fully customized events with setup locations.",
+              },
+              {
+                icon: Globe,
+                title: "Timezone Conversion",
+                desc: "Detect guest timezones automatically and display host availability seamlessly.",
+              },
+              {
+                icon: Video,
+                title: "Meet Link Generation",
+                desc: "Create and attach unique Google Meet links automatically to booked calendars.",
+              },
+              {
+                icon: Shield,
+                title: "Creative Aesthetics",
+                desc: "Experience fully interactive UI designs, premium dark modes, and bold themes.",
+              },
+            ].map((feat, index) => (
+              <Card key={index} className="p-6 flex flex-col justify-between h-56 bg-zinc-900 border border-zinc-800 text-white rounded-2xl">
+                <div className="w-12 h-12 rounded-full bg-[var(--primary)] text-black flex items-center justify-center shadow-inner">
+                  <feat.icon className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    {feat.title}
+                  </h3>
+                  <p className="text-sm text-zinc-400 leading-relaxed">
+                    {feat.desc}
+                  </p>
+                </div>
+              </Card>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="relative w-full max-w-7xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between z-10 border-t border-border/20 text-sm text-slate-500 dark:text-zinc-500">
-        <div>&copy; {new Date().getFullYear()} Chronos Inc. All rights reserved.</div>
+        <div>&copy; {new Date().getFullYear()} Palsa Inc. All rights reserved.</div>
         <div className="flex gap-6 mt-4 sm:mt-0">
           <Link href="#" className="hover:text-slate-800 dark:hover:text-zinc-200 transition-colors">Privacy</Link>
           <Link href="#" className="hover:text-slate-800 dark:hover:text-zinc-200 transition-colors">Terms</Link>

@@ -4,10 +4,12 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Profile, MeetingType, Availability, Booking } from "@/types";
 import { db } from "@/lib/db";
-import { processGoogleBooking } from "@/app/actions/booking";
+import { processGoogleBooking, fetchGoogleCalendarBusySlots } from "@/app/actions/booking";
+import { sendBookingConfirmationEmails } from "@/app/actions/email";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
+import { useAuth } from "@/components/providers/AuthProvider";
 import {
   Clock,
   Video,
@@ -37,7 +39,9 @@ export default function BookingPage() {
   const params = useParams();
   const router = useRouter();
   const username = params.username as string;
-  const eventSlug = params["event-slug"] as string;
+  const eventSlug = (params["event-slug"] || params.eventSlug) as string;
+
+  const { user: loggedInUser, signInWithGoogle } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -55,9 +59,18 @@ export default function BookingPage() {
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [notes, setNotes] = useState("");
+  const [isCustomDuration, setIsCustomDuration] = useState(false);
+  const [customDuration, setCustomDuration] = useState<number | "">("");
   const [submitting, setSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [successBooking, setSuccessBooking] = useState<Booking | null>(null);
+
+  useEffect(() => {
+    if (loggedInUser) {
+      setGuestName(loggedInUser.full_name || "");
+      setGuestEmail(loggedInUser.email || "");
+    }
+  }, [loggedInUser]);
 
   useEffect(() => {
     // Detect browser timezone
@@ -84,6 +97,25 @@ export default function BookingPage() {
     }
     loadData();
   }, [username, eventSlug]);
+
+  const [googleBusySlots, setGoogleBusySlots] = useState<{ start: string; end: string }[]>([]);
+
+  useEffect(() => {
+    async function loadGoogleBusy() {
+      if (profile) {
+        const timeMin = startOfMonth(currentMonth).toISOString();
+        const timeMax = endOfMonth(currentMonth).toISOString();
+        const busy = await fetchGoogleCalendarBusySlots(profile.id, timeMin, timeMax);
+        setGoogleBusySlots(busy);
+      }
+    }
+
+    loadGoogleBusy();
+
+    // Auto-refresh every 60 seconds so host calendar changes are reflected in real-time
+    const interval = setInterval(loadGoogleBusy, 60_000);
+    return () => clearInterval(interval);
+  }, [profile, currentMonth]);
 
   if (loading) {
     return (
@@ -124,19 +156,21 @@ export default function BookingPage() {
     if (isBefore(date, startOfDay(new Date()))) return false;
     const dayOfWeek = date.getDay();
     const dayAvail = availabilities.find((a) => a.day_of_week === dayOfWeek);
-    return !!dayAvail?.is_active;
+    return !!dayAvail;
   };
 
   // --- TIME SLOTS GENERATION ---
   const generateTimeSlotsForDate = (date: Date) => {
     const dayOfWeek = date.getDay();
     const dayAvail = availabilities.find((a) => a.day_of_week === dayOfWeek);
-    if (!dayAvail || !dayAvail.is_active) return [];
+    if (!dayAvail) return [];
 
     const slots: string[] = [];
     const [startH, startM] = dayAvail.start_time.split(":").map(Number);
     const [endH, endM] = dayAvail.end_time.split(":").map(Number);
-    const duration = meetingType.duration;
+    
+    const effectiveDuration = isCustomDuration && customDuration ? Number(customDuration) : meetingType.duration;
+    const duration = effectiveDuration;
 
     let current = new Date(date);
     current.setHours(startH, startM, 0, 0);
@@ -154,13 +188,25 @@ export default function BookingPage() {
 
       const hasConflict = existingBookings.some((bk) => {
         if (bk.status !== "scheduled") return false;
+        
+        // If this booking is synced to Google Calendar, trust Google's FreeBusy API instead of local DB.
+        // This allows the host to delete the event from Google Calendar to free up the slot.
+        if (bk.google_event_id && googleBusySlots.length > 0) return false;
+
         const bkStart = new Date(bk.start_time);
         const bkEnd = new Date(bk.end_time);
         // Overlap condition
         return slotStart < bkEnd && slotEnd > bkStart;
       });
 
-      if (!hasConflict) {
+      const hasGoogleConflict = googleBusySlots.some((slot) => {
+        const busyStart = new Date(slot.start);
+        const busyEnd = new Date(slot.end);
+        // Overlap condition
+        return slotStart < busyEnd && slotEnd > busyStart;
+      });
+
+      if (!hasConflict && !hasGoogleConflict) {
         slots.push(timeString);
       }
 
@@ -183,38 +229,50 @@ export default function BookingPage() {
       const [h, m] = selectedTime.split(":").map(Number);
       const start = new Date(selectedDate);
       start.setHours(h, m, 0, 0);
-      const end = new Date(start.getTime() + meetingType.duration * 60 * 1000);
+      
+      const effectiveDuration = isCustomDuration && customDuration ? Number(customDuration) : meetingType.duration;
+      const end = new Date(start.getTime() + effectiveDuration * 60 * 1000);
 
       const start_time = start.toISOString();
       const end_time = end.toISOString();
 
-      // Call Google API helper to schedule event and generate real Meet URL
-      const googleEventResult = await processGoogleBooking(
-        {
-          meeting_type_id: meetingType.id,
-          host_id: profile.id,
-          guest_name: guestName,
-          guest_email: guestEmail,
-          start_time,
-          end_time,
-          timezone: guestTimezone,
-          notes,
-        },
-        meetingType
-      );
+      // Try to create Google Calendar event (non-fatal — booking still saves if this fails)
+      let googleEventResult: { eventId?: string; meetLink?: string } | null = null;
+      try {
+        googleEventResult = await processGoogleBooking(
+          {
+            meeting_type_id: meetingType.id,
+            host_user_id: profile.id,
+            guest_name: guestName,
+            guest_email: guestEmail,
+            start_time,
+            end_time,
+            timezone: guestTimezone,
+            guest_notes: notes,
+          },
+          meetingType
+        );
+      } catch (googleErr) {
+        console.warn("Google Calendar event creation failed (non-fatal):", googleErr);
+      }
 
       const bookingData = await db.createBooking({
         meeting_type_id: meetingType.id,
-        host_id: profile.id,
+        host_user_id: profile.id,
         guest_name: guestName,
         guest_email: guestEmail,
         start_time,
         end_time,
         timezone: guestTimezone,
-        notes,
+        guest_notes: notes,
         google_event_id: googleEventResult?.eventId,
-        meeting_link: googleEventResult?.meetLink,
+        meet_link: googleEventResult?.meetLink,
       });
+
+      // Send confirmation emails to both guest and host (non-fatal)
+      sendBookingConfirmationEmails(bookingData, meetingType, profile).catch((e) =>
+        console.warn("[Email] Confirmation emails failed (non-fatal):", e)
+      );
 
       setSuccessBooking(bookingData);
       setIsSuccess(true);
@@ -225,8 +283,9 @@ export default function BookingPage() {
         spread: 80,
         origin: { y: 0.6 },
       });
-    } catch (err) {
-      alert("Failed to submit booking.");
+    } catch (err: any) {
+      console.error("Booking submission error:", err);
+      alert(`Failed to submit booking: ${err?.message || "Unknown error"}`);
     } finally {
       setSubmitting(false);
     }
@@ -264,19 +323,19 @@ export default function BookingPage() {
             <div className="flex justify-between border-b border-border/30 pb-2">
               <span className="text-slate-500">Location:</span>
               <span className="font-semibold text-slate-900 dark:text-white">
-                {meetingType.location_type === "google_meet" ? "Google Meet Link" : meetingType.location_details}
+                {meetingType.location_type === "google_meet" ? "Google Meet Link" : meetingType.meeting_link}
               </span>
             </div>
-            {successBooking.meeting_link && (
+            {successBooking.meet_link && (
               <div className="flex justify-between items-center pt-1">
                 <span className="text-slate-500">Meet Url:</span>
                 <a
-                  href={successBooking.meeting_link}
+                  href={successBooking.meet_link}
                   target="_blank"
                   rel="noreferrer"
                   className="font-semibold text-indigo-500 hover:underline truncate max-w-[200px]"
                 >
-                  {successBooking.meeting_link}
+                  {successBooking.meet_link}
                 </a>
               </div>
             )}
@@ -334,7 +393,7 @@ export default function BookingPage() {
                 <div className="flex flex-col gap-2 text-sm text-slate-600 dark:text-zinc-300 font-medium">
                   <div className="flex items-center gap-2">
                     <Clock className="w-4.5 h-4.5 text-indigo-500" />
-                    <span>{meetingType.duration} minutes</span>
+                    <span>{isCustomDuration && customDuration ? customDuration : meetingType.duration} minutes</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {meetingType.location_type === "google_meet" && (
@@ -352,7 +411,7 @@ export default function BookingPage() {
                     {meetingType.location_type === "custom" && (
                       <>
                         <LinkIcon className="w-4.5 h-4.5 text-slate-400" />
-                        <span className="truncate max-w-[200px]">{meetingType.location_details}</span>
+                        <span className="truncate max-w-[200px]">{meetingType.meeting_link}</span>
                       </>
                     )}
                   </div>
@@ -362,6 +421,45 @@ export default function BookingPage() {
                   {meetingType.description || "No description provided."}
                 </p>
               </div>
+            </div>
+
+            <div className="flex flex-col gap-4 mt-6 border-t border-border/20 pt-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-slate-500 dark:text-zinc-400">
+                  Different duration?
+                </span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 text-xs"
+                  onClick={() => {
+                    setIsCustomDuration(!isCustomDuration);
+                    setCustomDuration("");
+                    setSelectedTime(null);
+                  }}
+                >
+                  {isCustomDuration ? "Use Default" : "Custom Duration"}
+                </Button>
+              </div>
+              
+              {isCustomDuration && (
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    min={15}
+                    max={240}
+                    step={5}
+                    placeholder="Minutes (e.g. 45)"
+                    value={customDuration}
+                    onChange={(e) => {
+                      setCustomDuration(e.target.value ? Number(e.target.value) : "");
+                      setSelectedTime(null);
+                    }}
+                    className="w-full text-sm py-1.5"
+                  />
+                  <span className="text-xs text-slate-500">mins</span>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-zinc-500 mt-6 pl-0.5">
@@ -466,6 +564,39 @@ export default function BookingPage() {
                   </div>
                 )}
               </div>
+            ) : !loggedInUser ? (
+              // Ask user to login before booking
+              <div className="flex flex-col items-center justify-center text-center p-6 bg-slate-100/10 dark:bg-zinc-800/10 rounded-2xl border border-border/30 gap-5 flex-1 min-h-[300px]">
+                <div className="border-b border-border/40 pb-3 mb-2 w-full text-left">
+                  <h4 className="font-bold text-xs text-slate-500 uppercase tracking-wider">Selected Slot</h4>
+                  <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">
+                    {format(selectedDate, "MMM d, yyyy")} @ {selectedTime}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedTime(null)}
+                    className="text-xs text-indigo-500 hover:underline mt-1 cursor-pointer"
+                  >
+                    Change time
+                  </button>
+                </div>
+
+                <div className="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+                  <Globe className="w-6 h-6 animate-pulse" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-900 dark:text-white text-base">Authentication Required</h4>
+                  <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1 max-w-[240px] leading-relaxed">
+                    To prevent spam, please log in with your Google account to secure this appointment.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => signInWithGoogle(`/book/${username}/${eventSlug}`)}
+                  className="w-full mt-2"
+                >
+                  Continue with Google
+                </Button>
+              </div>
             ) : (
               // Show Booking Confirmation Details Form
               <form onSubmit={handleBookingSubmit} className="flex flex-col gap-4 flex-1">
@@ -522,7 +653,7 @@ export default function BookingPage() {
       </main>
 
       <footer className="text-center text-xs text-slate-500 dark:text-zinc-500 mt-12">
-        Powered by Chronos Premium Scheduling Platform
+        Powered by Palsa Premium Scheduling Platform
       </footer>
     </div>
   );

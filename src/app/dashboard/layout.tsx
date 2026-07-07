@@ -30,11 +30,17 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const router = useRouter();
 
+  const isAdmin = user?.role?.trim().toLowerCase() === "admin";
+
   React.useEffect(() => {
-    if (!loading && !user) {
-      router.push("/");
+    if (!loading) {
+      if (!user) {
+        router.push("/");
+      } else if (!isAdmin && (pathname === "/dashboard/availability" || pathname === "/dashboard/analytics")) {
+        router.push("/dashboard");
+      }
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, pathname, isAdmin]);
 
   if (loading || !user) {
     return (
@@ -50,16 +56,18 @@ export default function DashboardLayout({
       href: "/dashboard",
       icon: Clock,
     },
-    {
-      name: "Availability",
-      href: "/dashboard/availability",
-      icon: Calendar,
-    },
-    {
-      name: "Analytics",
-      href: "/dashboard/analytics",
-      icon: BarChart3,
-    },
+    ...(isAdmin ? [
+      {
+        name: "Availability",
+        href: "/dashboard/availability",
+        icon: Calendar,
+      },
+      {
+        name: "Analytics",
+        href: "/dashboard/analytics",
+        icon: BarChart3,
+      }
+    ] : []),
     {
       name: "Settings",
       href: "/dashboard/settings",
@@ -69,19 +77,17 @@ export default function DashboardLayout({
 
   return (
     <div className="relative min-h-screen flex bg-background">
-      {/* Background visual graphics */}
-      <div className="absolute top-0 right-0 w-[40%] h-[40%] rounded-full bg-indigo-500/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[40%] h-[40%] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
+      {/* Background visual graphics (Removed for flat theme) */}
 
       {/* Sidebar */}
       <aside className="w-64 border-r border-border/40 p-6 flex flex-col justify-between relative z-10 glass">
         <div className="flex flex-col gap-8">
           <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-indigo-500/25">
-              C
+            <div className="w-9 h-9 rounded-full bg-[var(--primary)] text-black border border-black flex items-center justify-center font-bold text-lg shadow-sm">
+              P
             </div>
-            <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-slate-900 to-indigo-950 bg-clip-text text-transparent dark:from-white dark:to-indigo-200">
-              Chronos
+            <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">
+              Palsa
             </span>
           </Link>
 
@@ -91,10 +97,10 @@ export default function DashboardLayout({
               <img
                 src={user.avatar_url}
                 alt={user.full_name}
-                className="w-10 h-10 rounded-full object-cover border border-indigo-500/30"
+                className="w-10 h-10 rounded-full object-cover border border-slate-300"
               />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-500 font-semibold">
+              <div className="w-10 h-10 rounded-full bg-[var(--primary)] flex items-center justify-center text-black font-semibold border border-black">
                 {user.full_name.charAt(0)}
               </div>
             )}
@@ -105,7 +111,7 @@ export default function DashboardLayout({
               <Link
                 href={`/${user.username}`}
                 target="_blank"
-                className="text-xs text-indigo-500 hover:text-indigo-400 flex items-center gap-1 mt-0.5 transition-colors group"
+                className="text-xs text-[var(--accent-foreground)] hover:opacity-80 flex items-center gap-1 mt-0.5 transition-colors group"
               >
                 Public page <ExternalLink className="w-3 h-3 group-hover:translate-x-[1px] transition-transform" />
               </Link>
@@ -121,7 +127,7 @@ export default function DashboardLayout({
                   <div
                     className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all group cursor-pointer ${
                       isActive
-                        ? "bg-indigo-600/10 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20"
+                        ? "bg-[var(--primary)] text-black border border-black shadow-sm"
                         : "hover:bg-slate-100/80 dark:hover:bg-zinc-800/80 text-slate-600 dark:text-zinc-400 border border-transparent"
                     }`}
                   >
@@ -132,7 +138,7 @@ export default function DashboardLayout({
                     <ChevronRight
                       className={`w-4 h-4 transition-transform group-hover:translate-x-[2px] ${
                         isActive
-                          ? "text-indigo-500"
+                          ? "text-black"
                           : "text-slate-400 dark:text-zinc-600 opacity-0 group-hover:opacity-100"
                       }`}
                     />

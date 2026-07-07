@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { db } from "@/lib/db";
 import { Card } from "@/components/ui/Card";
@@ -21,15 +21,26 @@ const TIMEZONES = [
 ];
 
 export default function SettingsPage() {
-  const { user, signInWithDemo } = useAuth();
+  const { user, signInWithGoogle, updatePassword } = useAuth();
   const [fullName, setFullName] = useState(user?.full_name || "");
   const [username, setUsername] = useState(user?.username || "");
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url || "");
   const [timezone, setTimezone] = useState(user?.timezone || "UTC");
+  const [newPassword, setNewPassword] = useState("");
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [googleConnected, setGoogleConnected] = useState(false);
   const [connectingGoogle, setConnectingGoogle] = useState(false);
+
+  useEffect(() => {
+    async function checkIntegration() {
+      if (user) {
+        const cred = await db.getGoogleCredential(user.id);
+        setGoogleConnected(!!cred);
+      }
+    }
+    checkIntegration();
+  }, [user]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,9 +48,19 @@ export default function SettingsPage() {
     setSuccess(false);
 
     try {
+      if (newPassword) {
+        const { error } = await updatePassword(newPassword);
+        if (error) {
+          alert("Failed to update password: " + error.message);
+          setSaving(false);
+          return;
+        }
+        setNewPassword(""); // clear after success
+      }
+
       await db.updateProfile({
         full_name: fullName,
-        username: username.toLowerCase().replace(/[^a-z0-9\-]/g, ""),
+        username: username.toLowerCase().replace(/[^a-z0-9\-_]/g, ""),
         avatar_url: avatarUrl,
         timezone,
       });
@@ -52,12 +73,31 @@ export default function SettingsPage() {
     }
   };
 
-  const handleConnectGoogle = () => {
+  const handleConnectGoogle = async () => {
     setConnectingGoogle(true);
-    setTimeout(() => {
-      setGoogleConnected(true);
+    try {
+      await signInWithGoogle();
+      // In mock/demo mode, save local dummy credential
+      if (user) {
+        await db.setGoogleCredential({
+          user_id: user.id,
+          provider: "google",
+          access_token: "mock-access-token",
+        });
+        setGoogleConnected(true);
+      }
+    } catch (e) {
+      alert("Failed to connect Google Calendar.");
+    } finally {
       setConnectingGoogle(false);
-    }, 1500);
+    }
+  };
+
+  const handleDisconnectGoogle = async () => {
+    if (user) {
+      const ok = await db.deleteGoogleCredential(user.id);
+      if (ok) setGoogleConnected(false);
+    }
   };
 
   return (
@@ -120,6 +160,22 @@ export default function SettingsPage() {
                 onChange={(e) => setAvatarUrl(e.target.value)}
               />
 
+              <hr className="border-border/50 my-2" />
+              
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-amber-500" /> Security
+              </h3>
+
+              <div className="flex flex-col gap-1.5">
+                <Input
+                  type="password"
+                  label="New Password"
+                  placeholder="Leave blank to keep current password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </div>
+
               <div className="flex justify-end gap-3 mt-2">
                 <Button type="submit" disabled={saving} className="min-w-[120px]">
                   {saving ? (
@@ -174,7 +230,7 @@ export default function SettingsPage() {
                 <Button
                   variant="secondary"
                   className="w-full text-red-500 border border-red-500/10 hover:bg-red-500/5 dark:hover:bg-red-500/10"
-                  onClick={() => setGoogleConnected(false)}
+                  onClick={handleDisconnectGoogle}
                 >
                   Disconnect Google
                 </Button>

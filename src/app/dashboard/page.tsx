@@ -75,7 +75,7 @@ export default function MeetingsPage() {
         description,
         duration: Number(duration),
         location_type: locationType,
-        location_details: locationType === "google_meet" ? "Google Meet link automatically generated" : locationDetails,
+        meeting_link: locationType === "google_meet" ? "Google Meet link automatically generated" : locationDetails,
         is_active: true,
       });
 
@@ -107,7 +107,7 @@ export default function MeetingsPage() {
   const handleCopyLink = (eventSlug: string, id: string) => {
     if (!user) return;
     const origin = window.location.origin;
-    const url = `${origin}/${user.username}/${eventSlug}`;
+    const url = `${origin}/book/${user.username}/${eventSlug}`;
     navigator.clipboard.writeText(url);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
@@ -172,7 +172,7 @@ export default function MeetingsPage() {
               <CardContent className="p-6 flex-1 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center gap-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-2">
-                    <Clock className="w-3.5 h-3.5" /> {mt.duration} Minutes
+                    <Clock className="w-3.5 h-3.5" /> {mt.duration < 60 ? `${mt.duration} Minutes` : mt.duration === 60 ? '1 Hour' : `${mt.duration / 60} Hours`}
                   </div>
                   <h3 className="font-semibold text-lg text-slate-900 dark:text-white truncate pr-6">
                     {mt.title}
@@ -198,7 +198,7 @@ export default function MeetingsPage() {
                   {mt.location_type === "custom" && (
                     <>
                       <LinkIcon className="w-4 h-4 text-slate-400" />
-                      <span className="truncate max-w-[150px]">{mt.location_details}</span>
+                      <span className="truncate max-w-[150px]">{mt.meeting_link}</span>
                     </>
                   )}
                 </div>
@@ -222,7 +222,7 @@ export default function MeetingsPage() {
                   )}
                 </button>
 
-                <Link href={`/${user?.username}/${mt.slug}`} target="_blank">
+                <Link href={`/book/${user?.username}/${mt.slug}`} target="_blank">
                   <Button variant="secondary" size="sm" className="rounded-lg">
                     View
                   </Button>
@@ -272,7 +272,11 @@ export default function MeetingsPage() {
                 <option value="15" className="dark:bg-zinc-900">15 Minutes</option>
                 <option value="30" className="dark:bg-zinc-900">30 Minutes</option>
                 <option value="45" className="dark:bg-zinc-900">45 Minutes</option>
-                <option value="60" className="dark:bg-zinc-900">60 Minutes</option>
+                <option value="60" className="dark:bg-zinc-900">1 Hour</option>
+                <option value="90" className="dark:bg-zinc-900">1.5 Hours</option>
+                <option value="120" className="dark:bg-zinc-900">2 Hours</option>
+                <option value="180" className="dark:bg-zinc-900">3 Hours</option>
+                <option value="240" className="dark:bg-zinc-900">4 Hours</option>
               </select>
             </div>
 

@@ -58,9 +58,7 @@ export default function PublicProfilePage() {
 
   return (
     <div className="min-h-screen bg-background relative flex flex-col justify-between py-16 px-6">
-      {/* Background blobs */}
-      <div className="absolute top-0 left-0 w-[40%] h-[40%] rounded-full bg-indigo-500/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[40%] h-[40%] rounded-full bg-purple-500/5 blur-[120px] pointer-events-none" />
+      {/* Background blobs (Removed for flat theme) */}
 
       <main className="max-w-4xl mx-auto w-full flex-1 flex flex-col items-center gap-10 relative z-10">
         {/* Host Details Header */}
@@ -69,10 +67,10 @@ export default function PublicProfilePage() {
             <img
               src={profile.avatar_url}
               alt={profile.full_name}
-              className="w-24 h-24 rounded-full object-cover border-2 border-indigo-500 shadow-xl"
+              className="w-24 h-24 rounded-full object-cover border-2 border-[var(--primary)] shadow-xl"
             />
           ) : (
-            <div className="w-24 h-24 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-3xl font-bold border border-indigo-500/20">
+            <div className="w-24 h-24 rounded-full bg-[var(--primary)] text-black flex items-center justify-center text-3xl font-bold border border-black">
               {profile.full_name.charAt(0)}
             </div>
           )}
@@ -93,7 +91,7 @@ export default function PublicProfilePage() {
           {meetingTypes.map((mt) => (
             <Card key={mt.id} variant="glass-interactive" className="flex flex-col justify-between p-6 min-h-[220px]">
               <div>
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-2">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--accent-foreground)] uppercase tracking-wider mb-2">
                   <Clock className="w-3.5 h-3.5" /> {mt.duration} Minutes
                 </div>
                 <h3 className="font-bold text-lg text-slate-900 dark:text-white line-clamp-1">
@@ -108,7 +106,7 @@ export default function PublicProfilePage() {
                 <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-zinc-400">
                   {mt.location_type === "google_meet" && (
                     <>
-                      <Video className="w-4 h-4 text-indigo-500" />
+                      <Video className="w-4 h-4 text-[var(--accent-foreground)]" />
                       <span>Google Meet</span>
                     </>
                   )}
@@ -121,12 +119,12 @@ export default function PublicProfilePage() {
                   {mt.location_type === "custom" && (
                     <>
                       <LinkIcon className="w-4 h-4 text-slate-400" />
-                      <span className="truncate max-w-[120px]">{mt.location_details}</span>
+                      <span className="truncate max-w-[120px]">{mt.meeting_link}</span>
                     </>
                   )}
                 </div>
 
-                <Link href={`/${profile.username}/${mt.slug}`} className="cursor-pointer">
+                <Link href={`/book/${profile.username}/${mt.slug}`} className="cursor-pointer">
                   <Button size="sm">Book Slot</Button>
                 </Link>
               </div>
@@ -136,7 +134,7 @@ export default function PublicProfilePage() {
       </main>
 
       <footer className="text-center text-xs text-slate-500 dark:text-zinc-500 mt-12">
-        Powered by Chronos Premium Scheduling Platform
+        Powered by Palsa Premium Scheduling Platform
       </footer>
     </div>
   );

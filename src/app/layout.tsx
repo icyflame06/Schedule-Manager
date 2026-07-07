@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Chronos - Premium Scheduling Platform",
-  description: "A premium glassmorphic scheduling platform for professionals and teams.",
+  title: "Palsa - Premium Scheduling Platform",
+  description: "Schedule your meetings in a beautifully designed glassmorphic interface.",
 };
 
 export default function RootLayout({

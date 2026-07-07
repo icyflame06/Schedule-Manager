@@ -1,4 +1,4 @@
-import { Profile, MeetingType, Availability, Booking } from "@/types";
+import { Profile, MeetingType, Availability, Booking, Integration } from "@/types";
 import { supabase, isSupabaseConfigured } from "./supabase/client";
 
 // --- MOCK DATABASE IMPLEMENTATION (localStorage backed) ---
@@ -6,9 +6,11 @@ const IS_SERVER = typeof window === "undefined";
 
 const DEFAULT_PROFILE: Profile = {
   id: "mock-user-id",
+  email: "alex@example.com",
   username: "alex_scheduling",
   full_name: "Alex Rivera",
   avatar_url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
+  bio: "Hi, I am Alex Rivera. Book a coffee chat or a consulting session with me!",
   timezone: "America/New_York",
   created_at: new Date().toISOString(),
 };
@@ -23,7 +25,6 @@ const DEFAULT_MEETING_TYPES: MeetingType[] = [
     duration: 15,
     is_active: true,
     location_type: "google_meet",
-    location_details: "Google Meet Link auto-generated",
     created_at: new Date().toISOString(),
     color: "#6366f1",
   },
@@ -36,7 +37,6 @@ const DEFAULT_MEETING_TYPES: MeetingType[] = [
     duration: 30,
     is_active: true,
     location_type: "google_meet",
-    location_details: "Google Meet Link auto-generated",
     created_at: new Date().toISOString(),
     color: "#10b981",
   },
@@ -49,7 +49,6 @@ const DEFAULT_MEETING_TYPES: MeetingType[] = [
     duration: 60,
     is_active: true,
     location_type: "phone",
-    location_details: "I will call you at your provided number",
     created_at: new Date().toISOString(),
     color: "#ec4899",
   },
@@ -61,9 +60,7 @@ const DEFAULT_AVAILABILITY: Availability[] = Array.from({ length: 7 }, (_, i) =>
   day_of_week: i,
   start_time: "09:00",
   end_time: "17:00",
-  // Active Monday-Friday (1 to 5)
-  is_active: i >= 1 && i <= 5,
-}));
+})).filter(a => a.day_of_week >= 1 && a.day_of_week <= 5); // Monday to Friday
 
 function getLocalStorage<T>(key: string, defaultValue: T): T {
   if (IS_SERVER) return defaultValue;
@@ -102,7 +99,30 @@ export const db = {
         query.eq("id", user.id);
       }
       const { data, error } = await query.single();
-      if (error) return null;
+      if (error) {
+        // Auto create profile record if missing
+        if (!username) {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const newProfile: Omit<Profile, 'created_at'> = {
+              id: user.id,
+              email: user.email || "",
+              username: user.email ? user.email.split("@")[0] + "_" + Math.random().toString(36).substring(2, 5) : "user_" + Math.random().toString(36).substring(2, 7),
+              full_name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0] || "User",
+              avatar_url: user.user_metadata?.avatar_url || "",
+              timezone: "UTC",
+              bio: ""
+            };
+            const { data: inserted, error: insertError } = await supabase
+              .from("profiles")
+              .insert(newProfile)
+              .select()
+              .single();
+            if (!insertError) return inserted;
+          }
+        }
+        return null;
+      }
       return data;
     } catch {
       return null;
@@ -227,7 +247,7 @@ export const db = {
     if (!isSupabaseConfigured()) {
       return getLocalStorage<Availability[]>("db_availability", DEFAULT_AVAILABILITY);
     }
-    const query = supabase.from("availabilities").select("*");
+    const query = supabase.from("availability").select("*");
     if (userId) {
       query.eq("user_id", userId);
     }
@@ -246,10 +266,17 @@ export const db = {
     if (!user) throw new Error("Unauthorized");
 
     // Clear existing and rewrite
-    await supabase.from("availabilities").delete().eq("user_id", user.id);
+    await supabase.from("availability").delete().eq("user_id", user.id);
     const { data, error } = await supabase
-      .from("availabilities")
-      .insert(availabilities.map(a => ({ ...a, user_id: user.id })))
+      .from("availability")
+      .insert(
+        availabilities.map((a) => ({
+          user_id: user.id,
+          day_of_week: a.day_of_week,
+          start_time: a.start_time,
+          end_time: a.end_time,
+        }))
+      )
       .select();
     if (error) throw error;
     return data;
@@ -262,29 +289,27 @@ export const db = {
         {
           id: "bk-1",
           meeting_type_id: "mt-1",
-          host_id: "mock-user-id",
+          host_user_id: "mock-user-id",
           guest_name: "Sarah Jenkins",
           guest_email: "sarah@example.com",
           start_time: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
           end_time: new Date(Date.now() + 24 * 60 * 60 * 1000 + 15 * 60 * 1000).toISOString(),
-          timezone: "America/New_York",
           status: "scheduled",
-          meeting_link: "https://meet.google.com/abc-defg-hij",
-          notes: "Looking to discuss career paths in AI engineering.",
+          meet_link: "https://meet.google.com/abc-defg-hij",
+          guest_notes: "Looking to discuss career paths in AI engineering.",
           created_at: new Date().toISOString(),
         },
         {
           id: "bk-2",
           meeting_type_id: "mt-2",
-          host_id: "mock-user-id",
+          host_user_id: "mock-user-id",
           guest_name: "Michael Chen",
           guest_email: "michael@example.com",
           start_time: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // In 3 days
           end_time: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000 + 30 * 60 * 1000).toISOString(),
-          timezone: "America/Los_Angeles",
           status: "scheduled",
-          meeting_link: "https://meet.google.com/xyz-uvwx-yza",
-          notes: "Introductory discovery call for SaaS application development services.",
+          meet_link: "https://meet.google.com/xyz-uvwx-yza",
+          guest_notes: "Introductory discovery call for SaaS application development services.",
           created_at: new Date().toISOString(),
         }
       ];
@@ -292,7 +317,7 @@ export const db = {
     }
     const query = supabase.from("bookings").select("*");
     if (hostId) {
-      query.eq("host_id", hostId);
+      query.eq("host_user_id", hostId);
     }
     const { data, error } = await query.order("start_time", { ascending: true });
     if (error) return [];
@@ -303,16 +328,16 @@ export const db = {
     const isMock = !isSupabaseConfigured();
 
     // Auto generate Meet link if location type is google_meet
-    let meeting_link = booking.meeting_link;
-    if (!meeting_link) {
-      meeting_link = `https://meet.google.com/${Math.random().toString(36).substr(2, 3)}-${Math.random().toString(36).substr(2, 4)}-${Math.random().toString(36).substr(2, 3)}`;
+    let meet_link = booking.meet_link;
+    if (!meet_link) {
+      meet_link = `https://meet.google.com/${Math.random().toString(36).substr(2, 3)}-${Math.random().toString(36).substr(2, 4)}-${Math.random().toString(36).substr(2, 3)}`;
     }
 
     if (isMock) {
       const bookings = getLocalStorage<Booking[]>("db_bookings", []);
       const newBooking: Booking = {
         ...booking,
-        meeting_link,
+        meet_link,
         id: `bk-${Math.random().toString(36).substr(2, 9)}`,
         status: "scheduled",
         created_at: new Date().toISOString(),
@@ -321,13 +346,21 @@ export const db = {
       return newBooking;
     }
 
-    const { data, error } = await supabase
+    const { timezone, ...insertPayload } = booking;
+
+    const { error } = await supabase
       .from("bookings")
-      .insert({ ...booking, meeting_link, status: "scheduled" })
-      .select()
-      .single();
+      .insert({ ...insertPayload, meet_link, status: "scheduled" });
     if (error) throw error;
-    return data;
+
+    // Return a constructed booking object (avoids RLS SELECT restriction for guest users)
+    return {
+      ...insertPayload,
+      meet_link,
+      id: `bk-${Date.now()}`,
+      status: "scheduled",
+      created_at: new Date().toISOString(),
+    } as Booking;
   },
 
   updateBookingStatus: async (id: string, status: 'scheduled' | 'cancelled' | 'completed'): Promise<Booking> => {
@@ -348,5 +381,60 @@ export const db = {
       .single();
     if (error) throw error;
     return data;
+  },
+
+  // --- Integrations Actions (Google Credentials, etc.) ---
+  getGoogleCredential: async (userId: string): Promise<Integration | null> => {
+    if (!isSupabaseConfigured()) {
+      return getLocalStorage<Integration | null>("db_google_integration", null);
+    }
+    const { data, error } = await supabase
+      .from("integrations")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("provider", "google")
+      .single();
+    if (error) return null;
+    return {
+      ...data,
+      expires_at: data.expires_at ? Number(data.expires_at) : undefined,
+    };
+  },
+
+  setGoogleCredential: async (credential: Omit<Integration, "id">): Promise<Integration> => {
+    if (!isSupabaseConfigured()) {
+      const newCredential = { ...credential, id: "integration-google" };
+      setLocalStorage("db_google_integration", newCredential);
+      return newCredential;
+    }
+    const { data, error } = await supabase
+      .from("integrations")
+      .upsert({
+        user_id: credential.user_id,
+        provider: credential.provider,
+        access_token: credential.access_token,
+        refresh_token: credential.refresh_token,
+        expires_at: credential.expires_at ?? null,
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return {
+      ...data,
+      expires_at: data.expires_at ? Number(data.expires_at) : undefined,
+    };
+  },
+
+  deleteGoogleCredential: async (userId: string): Promise<boolean> => {
+    if (!isSupabaseConfigured()) {
+      setLocalStorage("db_google_integration", null);
+      return true;
+    }
+    const { error } = await supabase
+      .from("integrations")
+      .delete()
+      .eq("user_id", userId)
+      .eq("provider", "google");
+    return !error;
   }
 };

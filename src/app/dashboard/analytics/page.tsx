@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
+import { cancelGoogleCalendarEvent } from "@/app/actions/booking";
 
 export default function AnalyticsPage() {
   const { user } = useAuth();
@@ -44,9 +45,16 @@ export default function AnalyticsPage() {
     const confirm = window.confirm("Are you sure you want to cancel this booking?");
     if (confirm) {
       try {
+        const bk = bookings.find((b) => b.id === id);
+        
+        // If it's linked to a Google Calendar event, delete it from there too
+        if (bk?.google_event_id && user) {
+          await cancelGoogleCalendarEvent(user.id, bk.google_event_id);
+        }
+
         const updated = await db.updateBookingStatus(id, "cancelled");
         setBookings((prev) =>
-          prev.map((bk) => (bk.id === id ? { ...bk, status: "cancelled" } : bk))
+          prev.map((b) => (b.id === id ? { ...b, status: "cancelled" } : b))
         );
       } catch (err) {
         alert("Failed to cancel booking.");
@@ -172,12 +180,12 @@ export default function AnalyticsPage() {
                             {bk.guest_email}
                           </span>
                           <span className="font-medium text-slate-800 dark:text-zinc-300">
-                            {formattedDate} @ {formattedTime} ({bk.timezone})
+                            {formattedDate} @ {formattedTime}
                           </span>
                         </div>
-                        {bk.notes && (
+                        {bk.guest_notes && (
                           <p className="text-xs text-slate-400 mt-2 bg-slate-100/30 dark:bg-zinc-800/20 p-2 rounded-lg italic">
-                            &ldquo;{bk.notes}&rdquo;
+                            &ldquo;{bk.guest_notes}&rdquo;
                           </p>
                         )}
                       </div>
@@ -185,8 +193,8 @@ export default function AnalyticsPage() {
 
                     {/* Action buttons */}
                     <div className="flex items-center gap-3">
-                      {bk.meeting_link && (
-                        <Link href={bk.meeting_link} target="_blank">
+                      {bk.meet_link && (
+                        <Link href={bk.meet_link} target="_blank">
                           <Button variant="secondary" size="sm" className="gap-1.5 rounded-lg py-2">
                             <Video className="w-4 h-4 text-indigo-500" /> Join Meet <ExternalLink className="w-3 h-3" />
                           </Button>

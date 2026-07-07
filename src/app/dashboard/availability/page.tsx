@@ -25,9 +25,16 @@ const TIME_SLOTS = Array.from({ length: 24 * 2 }, (_, i) => {
   return `${formattedHour}:${min}`;
 });
 
+interface UI_Availability {
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  is_active: boolean;
+}
+
 export default function AvailabilityPage() {
   const { user } = useAuth();
-  const [availabilities, setAvailabilities] = useState<Availability[]>([]);
+  const [uiAvailabilities, setUiAvailabilities] = useState<UI_Availability[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
@@ -37,7 +44,19 @@ export default function AvailabilityPage() {
     async function loadData() {
       if (user) {
         const data = await db.getAvailability(user.id);
-        setAvailabilities(data);
+        
+        // Generate UI slots for all 7 days
+        const mapped = Array.from({ length: 7 }, (_, i) => {
+          const match = data.find((a) => a.day_of_week === i);
+          return {
+            day_of_week: i,
+            start_time: match?.start_time || "09:00",
+            end_time: match?.end_time || "17:00",
+            is_active: !!match,
+          };
+        });
+        
+        setUiAvailabilities(mapped);
         setLoading(false);
       }
     }
@@ -45,7 +64,7 @@ export default function AvailabilityPage() {
   }, [user]);
 
   const handleToggleActive = (index: number) => {
-    setAvailabilities((prev) => {
+    setUiAvailabilities((prev) => {
       const copy = [...prev];
       copy[index] = { ...copy[index], is_active: !copy[index].is_active };
       return copy;
@@ -53,7 +72,7 @@ export default function AvailabilityPage() {
   };
 
   const handleTimeChange = (index: number, key: "start_time" | "end_time", value: string) => {
-    setAvailabilities((prev) => {
+    setUiAvailabilities((prev) => {
       const copy = [...prev];
       copy[index] = { ...copy[index], [key]: value };
       return copy;
@@ -66,7 +85,7 @@ export default function AvailabilityPage() {
     setError("");
 
     // Validate that start_time is before end_time for all active days
-    const invalidDay = availabilities.find(
+    const invalidDay = uiAvailabilities.find(
       (a) => a.is_active && a.start_time >= a.end_time
     );
 
@@ -77,7 +96,18 @@ export default function AvailabilityPage() {
     }
 
     try {
-      await db.updateAvailability(availabilities);
+      // Filter out inactive days and remove UI-only is_active key
+      const activeAvailabilities: Availability[] = uiAvailabilities
+        .filter((a) => a.is_active)
+        .map((a) => ({
+          id: `avail-${a.day_of_week}`,
+          user_id: user?.id || "mock-user-id",
+          day_of_week: a.day_of_week,
+          start_time: a.start_time,
+          end_time: a.end_time,
+        }));
+
+      await db.updateAvailability(activeAvailabilities);
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 3000);
     } catch (err) {
@@ -131,7 +161,7 @@ export default function AvailabilityPage() {
       <Card variant="glass" className="p-6">
         <div className="flex flex-col gap-5">
           {DAYS_OF_WEEK.map((dayName, idx) => {
-            const avail = availabilities.find((a) => a.day_of_week === idx);
+            const avail = uiAvailabilities[idx];
             if (!avail) return null;
 
             return (
