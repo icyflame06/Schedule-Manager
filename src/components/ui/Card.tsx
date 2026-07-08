@@ -14,10 +14,10 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-2xl overflow-hidden",
+        "rounded-xl overflow-hidden transition-all duration-300",
         {
-          "bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-sm": variant === "default",
-          "glass-card": variant === "glass",
+          "bg-white border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-1": variant === "default",
+          "glass-card hover:shadow-lg hover:-translate-y-1": variant === "glass",
           "glass-interactive": variant === "glass-interactive",
         },
         className
@@ -48,7 +48,7 @@ export function CardTitle({
 }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h3
-      className={cn("text-lg font-semibold tracking-tight text-slate-900 dark:text-white", className)}
+      className={cn("text-lg font-semibold tracking-tight text-slate-900", className)}
       {...props}
     >
       {children}
@@ -62,7 +62,7 @@ export function CardDescription({
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <p className={cn("text-sm text-slate-500 dark:text-zinc-400 mt-1.5", className)} {...props}>
+    <p className={cn("text-sm text-slate-500 mt-1.5", className)} {...props}>
       {children}
     </p>
   );

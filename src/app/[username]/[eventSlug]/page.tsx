@@ -128,9 +128,9 @@ export default function BookingPage() {
   if (!profile || !meetingType) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
-        <Card variant="glass" className="p-8 text-center max-w-md">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Meeting Not Found</h2>
-          <p className="text-slate-500 dark:text-zinc-400 mt-2 text-sm">
+        <Card variant="glass" className="p-8 text-center max-w-md shadow-xl border border-slate-200 bg-white">
+          <h2 className="text-xl font-bold text-slate-900">Meeting Not Found</h2>
+          <p className="text-slate-500 mt-2 text-sm">
             This booking link is invalid or the meeting template has been deactivated.
           </p>
           <Button className="mt-4" onClick={() => router.push("/")}>Go Home</Button>
@@ -294,7 +294,7 @@ export default function BookingPage() {
   if (isSuccess && successBooking) {
     return (
       <div className="min-h-screen bg-background relative flex items-center justify-center p-6">
-        <div className="absolute top-0 right-0 w-[45%] h-[45%] rounded-full bg-indigo-500/5 blur-[120px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[45%] h-[45%] rounded-full bg-[#FBBA00]/5 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[45%] h-[45%] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
 
         <Card variant="glass" className="p-8 text-center max-w-lg w-full flex flex-col items-center gap-6 shadow-2xl relative z-10">
@@ -303,26 +303,26 @@ export default function BookingPage() {
           </div>
 
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Booking Confirmed!</h1>
-            <p className="text-sm text-slate-500 dark:text-zinc-400 mt-2 leading-relaxed">
-              Your meeting with <span className="font-semibold text-slate-800 dark:text-zinc-200">{profile.full_name}</span> has been scheduled successfully.
+            <h1 className="text-2xl font-bold text-slate-900">Booking Confirmed!</h1>
+            <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+              Your meeting with <span className="font-semibold text-slate-800">{profile.full_name}</span> has been scheduled successfully.
             </p>
           </div>
 
-          <div className="w-full p-5 rounded-xl border border-border/30 bg-slate-100/25 dark:bg-zinc-800/10 text-left flex flex-col gap-3 text-sm">
-            <div className="flex justify-between border-b border-border/30 pb-2">
+          <div className="w-full p-5 rounded-xl border border-slate-200 bg-slate-50 text-left flex flex-col gap-3 text-sm shadow-inner">
+            <div className="flex justify-between border-b border-slate-200 pb-2">
               <span className="text-slate-500">Meeting:</span>
-              <span className="font-semibold text-slate-900 dark:text-white">{meetingType.title}</span>
+              <span className="font-semibold text-slate-900">{meetingType.title}</span>
             </div>
-            <div className="flex justify-between border-b border-border/30 pb-2">
+            <div className="flex justify-between border-b border-slate-200 pb-2">
               <span className="text-slate-500">Time:</span>
-              <span className="font-semibold text-slate-900 dark:text-white">
+              <span className="font-semibold text-slate-900">
                 {format(new Date(successBooking.start_time), "MMMM d, yyyy")} @ {format(new Date(successBooking.start_time), "h:mm a")} ({guestTimezone})
               </span>
             </div>
-            <div className="flex justify-between border-b border-border/30 pb-2">
+            <div className="flex justify-between border-b border-slate-200 pb-2">
               <span className="text-slate-500">Location:</span>
-              <span className="font-semibold text-slate-900 dark:text-white">
+              <span className="font-semibold text-slate-900">
                 {meetingType.location_type === "google_meet" ? "Google Meet Link" : meetingType.meeting_link}
               </span>
             </div>
@@ -351,7 +351,7 @@ export default function BookingPage() {
 
   return (
     <div className="min-h-screen bg-background relative flex flex-col justify-between py-12 px-6">
-      <div className="absolute top-0 right-0 w-[40%] h-[40%] rounded-full bg-indigo-500/5 blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[40%] h-[40%] rounded-full bg-[#FBBA00]/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[40%] h-[40%] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
 
       <main className="max-w-6xl mx-auto w-full flex-1 relative z-10 flex items-center justify-center">
@@ -359,47 +359,47 @@ export default function BookingPage() {
           
           {/* Left panel: Info */}
           <div className="lg:col-span-4 p-8 border-b lg:border-b-0 lg:border-r border-border/40 flex flex-col justify-between">
-            <div className="flex flex-col gap-5">
-              <button
-                onClick={() => router.push(`/${profile.username}`)}
-                className="text-xs font-semibold text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1 cursor-pointer"
-              >
-                <ChevronLeft className="w-3.5 h-3.5" /> Back to Profile
-              </button>
+              <div className="flex flex-col gap-5">
+                <button
+                  onClick={() => router.push(`/${profile.username}`)}
+                  className="text-xs font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer transition-colors"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" /> Back to Profile
+                </button>
 
-              <div className="flex items-center gap-3 mt-2">
-                {profile.avatar_url ? (
-                  <img
-                    src={profile.avatar_url}
-                    alt={profile.full_name}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center font-bold">
-                    {profile.full_name.charAt(0)}
+                <div className="flex items-center gap-3 mt-2">
+                  {profile.avatar_url ? (
+                    <img
+                      src={profile.avatar_url}
+                      alt={profile.full_name}
+                      className="w-12 h-12 rounded-full object-cover border-[2px] border-[#FBBA00] shadow-sm"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-[var(--primary)] text-[#111111] flex items-center justify-center font-bold shadow-sm">
+                      {profile.full_name.charAt(0)}
+                    </div>
+                  )}
+                  <div>
+                    <h4 className="text-xs text-slate-500">Scheduling with</h4>
+                    <h3 className="font-bold text-slate-900 text-sm">{profile.full_name}</h3>
                   </div>
-                )}
-                <div>
-                  <h4 className="text-xs text-slate-500 dark:text-zinc-400">Scheduling with</h4>
-                  <h3 className="font-bold text-slate-900 dark:text-white text-sm">{profile.full_name}</h3>
                 </div>
-              </div>
 
-              <div className="flex flex-col gap-3 mt-4">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white leading-tight">
-                  {meetingType.title}
-                </h1>
+                <div className="flex flex-col gap-3 mt-4">
+                  <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 leading-tight">
+                    {meetingType.title}
+                  </h1>
 
-                <div className="flex flex-col gap-2 text-sm text-slate-600 dark:text-zinc-300 font-medium">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4.5 h-4.5 text-indigo-500" />
-                    <span>{isCustomDuration && customDuration ? customDuration : meetingType.duration} minutes</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {meetingType.location_type === "google_meet" && (
-                      <>
-                        <Video className="w-4.5 h-4.5 text-indigo-500" />
-                        <span>Google Meet (auto-generated)</span>
+                  <div className="flex flex-col gap-2 text-sm text-slate-600 font-medium">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4.5 h-4.5 text-[#FBBA00]" />
+                      <span>{isCustomDuration && customDuration ? customDuration : meetingType.duration} minutes</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {meetingType.location_type === "google_meet" && (
+                        <>
+                          <Video className="w-4.5 h-4.5 text-[#FBBA00]" />
+                          <span>Google Meet (auto-generated)</span>
                       </>
                     )}
                     {meetingType.location_type === "phone" && (
@@ -417,7 +417,7 @@ export default function BookingPage() {
                   </div>
                 </div>
 
-                <p className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed mt-2 border-t border-border/20 pt-4">
+                <p className="text-xs text-slate-500 leading-relaxed mt-2 border-t border-slate-100 pt-4">
                   {meetingType.description || "No description provided."}
                 </p>
               </div>
@@ -462,7 +462,7 @@ export default function BookingPage() {
               )}
             </div>
 
-            <div className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-zinc-500 mt-6 pl-0.5">
+            <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-6 pl-0.5">
               <Globe className="w-3.5 h-3.5" />
               <span>{guestTimezone} Timezone</span>
             </div>
@@ -472,7 +472,7 @@ export default function BookingPage() {
           <div className="lg:col-span-5 p-8 flex flex-col border-b lg:border-b-0 lg:border-r border-border/40 justify-between">
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h3 className="font-bold text-slate-900 dark:text-white">Select Date & Time</h3>
+                <h3 className="font-bold text-slate-900">Select Date & Time</h3>
                 <div className="flex gap-1.5">
                   <Button variant="ghost" className="p-2.5 rounded-xl cursor-pointer" onClick={handlePrevMonth}>
                     <ChevronLeft className="w-4.5 h-4.5" />
@@ -483,12 +483,12 @@ export default function BookingPage() {
                 </div>
               </div>
 
-              <div className="text-center font-semibold text-sm text-slate-900 dark:text-white mb-4">
+              <div className="text-center font-semibold text-sm text-slate-900 mb-4">
                 {format(currentMonth, "MMMM yyyy")}
               </div>
 
               {/* Day Labels */}
-              <div className="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase mb-2">
+              <div className="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-400 uppercase mb-2">
                 <span>Su</span>
                 <span>Mo</span>
                 <span>Tu</span>
@@ -518,10 +518,10 @@ export default function BookingPage() {
                       }}
                       className={`aspect-square flex items-center justify-center rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                         isSelected
-                          ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20"
+                          ? "bg-[var(--primary)] text-[#111111] shadow-md shadow-[#FBBA00]/20"
                           : available
-                          ? "bg-indigo-500/5 dark:bg-indigo-400/5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20"
-                          : "text-slate-300 dark:text-zinc-700 cursor-not-allowed"
+                          ? "bg-[#FBBA00]/5 text-[#111111] hover:bg-[#FBBA00]/20"
+                          : "text-slate-300 cursor-not-allowed"
                       }`}
                     >
                       {format(day, "d")}
@@ -539,24 +539,24 @@ export default function BookingPage() {
           {/* Right panel: Time Slots or Form details */}
           <div className="lg:col-span-3 p-8 flex flex-col justify-between max-h-[580px] overflow-y-auto">
             {!selectedDate ? (
-              <div className="flex-1 flex flex-col items-center justify-center text-center text-slate-500 dark:text-zinc-400">
-                <Clock className="w-10 h-10 text-slate-300 dark:text-zinc-700 mb-3" />
+              <div className="flex-1 flex flex-col items-center justify-center text-center text-slate-500">
+                <Clock className="w-10 h-10 text-slate-300 mb-3" />
                 <p className="text-sm font-medium">Please select a date from the calendar grid</p>
               </div>
             ) : !selectedTime ? (
               <div className="flex flex-col gap-4 flex-1">
-                <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                <h4 className="font-bold text-sm text-slate-900">
                   Available Slots for {format(selectedDate, "MMM d")}
                 </h4>
                 {timeSlots.length === 0 ? (
-                  <p className="text-xs text-slate-500 dark:text-zinc-400 italic">No available times left today.</p>
+                  <p className="text-xs text-slate-500 italic">No available times left today.</p>
                 ) : (
                   <div className="flex flex-col gap-2 overflow-y-auto max-h-[420px] pr-1">
                     {timeSlots.map((slot) => (
                       <button
                         key={slot}
                         onClick={() => setSelectedTime(slot)}
-                        className="w-full py-3 rounded-xl border border-indigo-500/10 bg-indigo-500/5 dark:bg-indigo-400/5 hover:bg-indigo-600 text-indigo-600 dark:text-indigo-400 hover:text-white text-sm font-bold transition-all cursor-pointer text-center"
+                        className="w-full py-3 rounded-xl border border-[#FBBA00]/20 bg-white hover:bg-[var(--primary)] text-slate-900 hover:text-[#111111] text-sm font-bold transition-all cursor-pointer text-center shadow-sm"
                       >
                         {slot}
                       </button>
@@ -566,27 +566,27 @@ export default function BookingPage() {
               </div>
             ) : !loggedInUser ? (
               // Ask user to login before booking
-              <div className="flex flex-col items-center justify-center text-center p-6 bg-slate-100/10 dark:bg-zinc-800/10 rounded-2xl border border-border/30 gap-5 flex-1 min-h-[300px]">
-                <div className="border-b border-border/40 pb-3 mb-2 w-full text-left">
+              <div className="flex flex-col items-center justify-center text-center p-6 bg-slate-50 rounded-2xl border border-slate-200 gap-5 flex-1 min-h-[300px] shadow-inner">
+                <div className="border-b border-slate-200 pb-3 mb-2 w-full text-left">
                   <h4 className="font-bold text-xs text-slate-500 uppercase tracking-wider">Selected Slot</h4>
-                  <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">
+                  <p className="text-sm font-bold text-slate-900 mt-1">
                     {format(selectedDate, "MMM d, yyyy")} @ {selectedTime}
                   </p>
                   <button
                     type="button"
                     onClick={() => setSelectedTime(null)}
-                    className="text-xs text-indigo-500 hover:underline mt-1 cursor-pointer"
+                    className="text-xs text-[var(--primary)] hover:underline mt-1 cursor-pointer"
                   >
                     Change time
                   </button>
                 </div>
 
-                <div className="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+                <div className="w-12 h-12 rounded-full bg-[#FBBA00]/10 flex items-center justify-center text-[#FBBA00]">
                   <Globe className="w-6 h-6 animate-pulse" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-900 dark:text-white text-base">Authentication Required</h4>
-                  <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1 max-w-[240px] leading-relaxed">
+                  <h4 className="font-bold text-slate-900 text-base">Authentication Required</h4>
+                  <p className="text-xs text-slate-500 mt-1 max-w-[240px] leading-relaxed">
                     To prevent spam, please log in with your Google account to secure this appointment.
                   </p>
                 </div>
@@ -600,15 +600,15 @@ export default function BookingPage() {
             ) : (
               // Show Booking Confirmation Details Form
               <form onSubmit={handleBookingSubmit} className="flex flex-col gap-4 flex-1">
-                <div className="border-b border-border/40 pb-3 mb-2">
+                <div className="border-b border-slate-200 pb-3 mb-2">
                   <h4 className="font-bold text-xs text-slate-500 uppercase tracking-wider">Selected Slot</h4>
-                  <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">
+                  <p className="text-sm font-bold text-slate-900 mt-1">
                     {format(selectedDate, "MMM d, yyyy")} @ {selectedTime}
                   </p>
                   <button
                     type="button"
                     onClick={() => setSelectedTime(null)}
-                    className="text-xs text-indigo-500 hover:underline mt-1 cursor-pointer"
+                    className="text-xs text-[var(--primary)] hover:underline mt-1 cursor-pointer"
                   >
                     Change time
                   </button>
@@ -652,7 +652,7 @@ export default function BookingPage() {
         </Card>
       </main>
 
-      <footer className="text-center text-xs text-slate-500 dark:text-zinc-500 mt-12">
+      <footer className="text-center text-xs text-slate-500 mt-12">
         Powered by Palsa Premium Scheduling Platform
       </footer>
     </div>

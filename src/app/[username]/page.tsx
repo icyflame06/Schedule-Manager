@@ -44,8 +44,8 @@ export default function PublicProfilePage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
         <Card variant="glass" className="p-8 text-center max-w-md">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">User Not Found</h2>
-          <p className="text-slate-500 dark:text-zinc-400 mt-2 text-sm">
+          <h2 className="text-xl font-bold text-slate-900">User Not Found</h2>
+          <p className="text-slate-500 mt-2 text-sm">
             The profile page you are looking for does not exist or has been disabled.
           </p>
           <Link href="/">
@@ -67,19 +67,19 @@ export default function PublicProfilePage() {
             <img
               src={profile.avatar_url}
               alt={profile.full_name}
-              className="w-24 h-24 rounded-full object-cover border-2 border-[var(--primary)] shadow-xl"
+              className="w-24 h-24 rounded-full object-cover border-[3px] border-[#FBBA00] shadow-lg"
             />
           ) : (
-            <div className="w-24 h-24 rounded-full bg-[var(--primary)] text-black flex items-center justify-center text-3xl font-bold border border-black">
+            <div className="w-24 h-24 rounded-full bg-[var(--primary)] text-[#111111] flex items-center justify-center text-3xl font-bold">
               {profile.full_name.charAt(0)}
             </div>
           )}
 
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white leading-snug">
+            <h1 className="text-2xl font-bold text-slate-900 leading-snug">
               {profile.full_name}
             </h1>
-            <div className="flex items-center justify-center gap-1.5 text-xs text-slate-500 dark:text-zinc-400 mt-1">
+            <div className="flex items-center justify-center gap-1.5 text-xs text-slate-500 mt-1 font-medium">
               <Globe className="w-3.5 h-3.5" />
               <span>{profile.timezone} Timezone</span>
             </div>
@@ -91,22 +91,22 @@ export default function PublicProfilePage() {
           {meetingTypes.map((mt) => (
             <Card key={mt.id} variant="glass-interactive" className="flex flex-col justify-between p-6 min-h-[220px]">
               <div>
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--accent-foreground)] uppercase tracking-wider mb-2">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-[#FBBA00] uppercase tracking-wider mb-2">
                   <Clock className="w-3.5 h-3.5" /> {mt.duration} Minutes
                 </div>
-                <h3 className="font-bold text-lg text-slate-900 dark:text-white line-clamp-1">
+                <h3 className="font-bold text-lg text-slate-900 line-clamp-1">
                   {mt.title}
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-zinc-400 line-clamp-3 mt-2 leading-relaxed">
+                <p className="text-xs text-slate-600 line-clamp-3 mt-2 leading-relaxed">
                   {mt.description || "No description provided."}
                 </p>
               </div>
 
-              <div className="flex items-center justify-between gap-4 mt-6 border-t border-border/20 pt-4">
-                <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-zinc-400">
+              <div className="flex items-center justify-between gap-4 mt-6 border-t border-slate-100 pt-4">
+                <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
                   {mt.location_type === "google_meet" && (
                     <>
-                      <Video className="w-4 h-4 text-[var(--accent-foreground)]" />
+                      <Video className="w-4 h-4 text-[#FBBA00]" />
                       <span>Google Meet</span>
                     </>
                   )}
@@ -133,7 +133,7 @@ export default function PublicProfilePage() {
         </div>
       </main>
 
-      <footer className="text-center text-xs text-slate-500 dark:text-zinc-500 mt-12">
+      <footer className="text-center text-xs text-slate-500 mt-12">
         Powered by Palsa Premium Scheduling Platform
       </footer>
     </div>

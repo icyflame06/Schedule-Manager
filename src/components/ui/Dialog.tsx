@@ -37,7 +37,7 @@ export function Dialog({ isOpen, onClose, title, children }: DialogProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-slate-950/40 dark:bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm"
             onClick={onClose}
           />
 
@@ -53,7 +53,7 @@ export function Dialog({ isOpen, onClose, title, children }: DialogProps) {
               {/* Header */}
               <div className="flex items-center justify-between p-6 pb-4 border-b border-border/40">
                 {title ? (
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white leading-none">
+                  <h3 className="text-lg font-semibold text-slate-900 leading-none">
                     {title}
                   </h3>
                 ) : (
@@ -61,7 +61,7 @@ export function Dialog({ isOpen, onClose, title, children }: DialogProps) {
                 )}
                 <button
                   onClick={onClose}
-                  className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-500 dark:text-zinc-400 transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>

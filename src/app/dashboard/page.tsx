@@ -126,10 +126,10 @@ export default function MeetingsPage() {
       {/* Header section */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             Meeting Types
           </h1>
-          <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">
+          <p className="text-sm text-slate-500 mt-1">
             Create event templates that clients can book directly.
           </p>
         </div>
@@ -141,12 +141,12 @@ export default function MeetingsPage() {
       {/* Grid of Meeting Types */}
       {meetingTypes.length === 0 ? (
         <Card variant="glass" className="p-10 text-center flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+          <div className="w-12 h-12 rounded-xl bg-[#FBBA00]/10 flex items-center justify-center text-[#FBBA00]">
             <Clock className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="font-semibold text-lg text-slate-900 dark:text-white">No Meeting Types</h3>
-            <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">
+            <h3 className="font-semibold text-lg text-slate-900">No Meeting Types</h3>
+            <p className="text-sm text-slate-500 mt-1">
               Create your first meeting template to start scheduling.
             </p>
           </div>
@@ -171,21 +171,21 @@ export default function MeetingsPage() {
 
               <CardContent className="p-6 flex-1 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-2">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-[#FBBA00] uppercase tracking-wider mb-2">
                     <Clock className="w-3.5 h-3.5" /> {mt.duration < 60 ? `${mt.duration} Minutes` : mt.duration === 60 ? '1 Hour' : `${mt.duration / 60} Hours`}
                   </div>
-                  <h3 className="font-semibold text-lg text-slate-900 dark:text-white truncate pr-6">
+                  <h3 className="font-semibold text-lg text-slate-900 truncate pr-6">
                     {mt.title}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-zinc-400 line-clamp-3 mt-2 leading-relaxed">
+                  <p className="text-xs text-slate-500 line-clamp-3 mt-2 leading-relaxed">
                     {mt.description || "No description provided."}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2 mt-4 text-sm font-medium text-slate-600 dark:text-zinc-300">
+                <div className="flex items-center gap-2 mt-4 text-sm font-medium text-slate-600">
                   {mt.location_type === "google_meet" && (
                     <>
-                      <Video className="w-4 h-4 text-indigo-500" />
+                      <Video className="w-4 h-4 text-[#FBBA00]" />
                       <span>Google Meet</span>
                     </>
                   )}
@@ -204,10 +204,10 @@ export default function MeetingsPage() {
                 </div>
               </CardContent>
 
-              <div className="p-4 border-t border-border/40 flex items-center justify-between gap-3 bg-slate-50/30 dark:bg-zinc-900/30">
+              <div className="p-4 border-t border-slate-100 flex items-center justify-between gap-3 bg-slate-50/50">
                 <button
                   onClick={() => handleCopyLink(mt.slug, mt.id)}
-                  className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline flex items-center gap-1.5 cursor-pointer"
+                  className="text-xs text-[var(--primary)] font-semibold hover:underline flex items-center gap-1.5 cursor-pointer"
                 >
                   {copiedId === mt.id ? (
                     <>
@@ -267,16 +267,16 @@ export default function MeetingsPage() {
               <select
                 value={duration}
                 onChange={(e) => setDuration(Number(e.target.value))}
-                className="w-full px-4 py-3 rounded-xl text-sm text-slate-900 dark:text-white glass-input transition-all"
+                className="w-full px-4 py-3 rounded-xl text-sm text-slate-900 glass-input transition-all"
               >
-                <option value="15" className="dark:bg-zinc-900">15 Minutes</option>
-                <option value="30" className="dark:bg-zinc-900">30 Minutes</option>
-                <option value="45" className="dark:bg-zinc-900">45 Minutes</option>
-                <option value="60" className="dark:bg-zinc-900">1 Hour</option>
-                <option value="90" className="dark:bg-zinc-900">1.5 Hours</option>
-                <option value="120" className="dark:bg-zinc-900">2 Hours</option>
-                <option value="180" className="dark:bg-zinc-900">3 Hours</option>
-                <option value="240" className="dark:bg-zinc-900">4 Hours</option>
+                <option value="15">15 Minutes</option>
+                <option value="30">30 Minutes</option>
+                <option value="45">45 Minutes</option>
+                <option value="60">1 Hour</option>
+                <option value="90">1.5 Hours</option>
+                <option value="120">2 Hours</option>
+                <option value="180">3 Hours</option>
+                <option value="240">4 Hours</option>
               </select>
             </div>
 
@@ -287,11 +287,11 @@ export default function MeetingsPage() {
               <select
                 value={locationType}
                 onChange={(e) => setLocationType(e.target.value as any)}
-                className="w-full px-4 py-3 rounded-xl text-sm text-slate-900 dark:text-white glass-input transition-all"
+                className="w-full px-4 py-3 rounded-xl text-sm text-slate-900 glass-input transition-all"
               >
-                <option value="google_meet" className="dark:bg-zinc-900">Google Meet</option>
-                <option value="phone" className="dark:bg-zinc-900">Phone Call</option>
-                <option value="custom" className="dark:bg-zinc-900">Custom Address</option>
+                <option value="google_meet">Google Meet</option>
+                <option value="phone">Phone Call</option>
+                <option value="custom">Custom Address</option>
               </select>
             </div>
           </div>

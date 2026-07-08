@@ -130,10 +130,10 @@ export default function AvailabilityPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             Weekly Availability
           </h1>
-          <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">
+          <p className="text-sm text-slate-500 mt-1">
             Define your operational hours during which guests can schedule events.
           </p>
         </div>
@@ -169,8 +169,8 @@ export default function AvailabilityPage() {
                 key={dayName}
                 className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border transition-all ${
                   avail.is_active
-                    ? "bg-slate-100/30 dark:bg-zinc-800/20 border-border/60"
-                    : "bg-slate-100/10 dark:bg-zinc-800/5 border-border/10 opacity-60"
+                    ? "bg-slate-50 border-slate-200 shadow-sm"
+                    : "bg-slate-100/30 border-slate-100 opacity-60"
                 }`}
               >
                 {/* Day Switch Toggle */}
@@ -179,8 +179,8 @@ export default function AvailabilityPage() {
                     onClick={() => handleToggleActive(idx)}
                     className={`w-11 h-6 rounded-full p-0.5 transition-colors cursor-pointer ${
                       avail.is_active
-                        ? "bg-indigo-600 dark:bg-indigo-500"
-                        : "bg-slate-300 dark:bg-zinc-700"
+                        ? "bg-[var(--primary)]"
+                        : "bg-slate-300"
                     }`}
                   >
                     <div
@@ -189,7 +189,7 @@ export default function AvailabilityPage() {
                       }`}
                     />
                   </button>
-                  <span className="font-semibold text-slate-800 dark:text-zinc-200">
+                  <span className="font-semibold text-slate-800">
                     {dayName}
                   </span>
                 </div>
@@ -200,31 +200,31 @@ export default function AvailabilityPage() {
                     <select
                       value={avail.start_time}
                       onChange={(e) => handleTimeChange(idx, "start_time", e.target.value)}
-                      className="px-3 py-2 rounded-xl text-sm text-slate-900 dark:text-white glass border-border/40 focus:ring-2 focus:ring-indigo-500/20"
+                      className="px-3 py-2 rounded-xl text-sm text-slate-900 glass border-slate-200 focus:ring-2 focus:ring-[#FBBA00]/30"
                     >
                       {TIME_SLOTS.map((slot) => (
-                        <option key={`start-${slot}`} value={slot} className="dark:bg-zinc-900">
+                        <option key={`start-${slot}`} value={slot}>
                           {slot}
                         </option>
                       ))}
                     </select>
 
-                    <span className="text-slate-400 dark:text-zinc-600 text-sm font-semibold">to</span>
+                    <span className="text-slate-400 text-sm font-semibold">to</span>
 
                     <select
                       value={avail.end_time}
                       onChange={(e) => handleTimeChange(idx, "end_time", e.target.value)}
-                      className="px-3 py-2 rounded-xl text-sm text-slate-900 dark:text-white glass border-border/40 focus:ring-2 focus:ring-indigo-500/20"
+                      className="px-3 py-2 rounded-xl text-sm text-slate-900 glass border-slate-200 focus:ring-2 focus:ring-[#FBBA00]/30"
                     >
                       {TIME_SLOTS.map((slot) => (
-                        <option key={`end-${slot}`} value={slot} className="dark:bg-zinc-900">
+                        <option key={`end-${slot}`} value={slot}>
                           {slot}
                         </option>
                       ))}
                     </select>
                   </div>
                 ) : (
-                  <div className="text-sm text-slate-400 dark:text-zinc-500 mt-3 sm:mt-0 font-medium">
+                  <div className="text-sm text-slate-400 mt-3 sm:mt-0 font-medium">
                     Unavailable
                   </div>
                 )}

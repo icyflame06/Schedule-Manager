@@ -84,10 +84,10 @@ export default function AnalyticsPage() {
     <div className="flex flex-col gap-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
           Analytics & Bookings
         </h1>
-        <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">
+        <p className="text-sm text-slate-500 mt-1">
           Review your scheduled event statistics and manage bookings.
         </p>
       </div>
@@ -99,11 +99,11 @@ export default function AnalyticsPage() {
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 pl-0.5">
               Active Bookings
             </span>
-            <span className="text-3xl font-extrabold text-slate-900 dark:text-white mt-1">
+            <span className="text-3xl font-extrabold text-slate-900 mt-1">
               {activeBookings.length}
             </span>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+          <div className="w-12 h-12 rounded-xl bg-[#FBBA00]/10 flex items-center justify-center text-[#FBBA00]">
             <CalendarDays className="w-6 h-6" />
           </div>
         </Card>
@@ -113,11 +113,11 @@ export default function AnalyticsPage() {
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 pl-0.5">
               Minutes Scheduled
             </span>
-            <span className="text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-1">
+            <span className="text-3xl font-extrabold text-[#FBBA00] mt-1">
               {totalMinutesBooked}m
             </span>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+          <div className="w-12 h-12 rounded-xl bg-[#FBBA00]/10 flex items-center justify-center text-[#FBBA00]">
             <Clock className="w-6 h-6" />
           </div>
         </Card>
@@ -127,7 +127,7 @@ export default function AnalyticsPage() {
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 pl-0.5">
               Total Managed Events
             </span>
-            <span className="text-3xl font-extrabold text-slate-900 dark:text-white mt-1">
+            <span className="text-3xl font-extrabold text-slate-900 mt-1">
               {totalBookings}
             </span>
           </div>
@@ -139,12 +139,12 @@ export default function AnalyticsPage() {
 
       {/* Bookings List */}
       <div className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+        <h2 className="text-lg font-semibold text-slate-900">
           Scheduled Bookings ({activeBookings.length})
         </h2>
 
         {activeBookings.length === 0 ? (
-          <Card variant="glass" className="p-8 text-center text-slate-500 dark:text-zinc-400">
+          <Card variant="glass" className="p-8 text-center text-slate-500">
             No upcoming meetings scheduled.
           </Card>
         ) : (
@@ -158,33 +158,33 @@ export default function AnalyticsPage() {
               )}`;
 
               return (
-                <Card key={bk.id} variant="glass" className="p-5 hover:border-indigo-500/25 transition-all">
+                <Card key={bk.id} variant="glass" className="p-5 hover:border-[#FBBA00]/30 hover:shadow-md transition-all">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
                     {/* Guest & meeting details */}
                     <div className="flex-1 flex flex-col sm:flex-row gap-4 sm:items-center">
-                      <div className="w-12 h-12 rounded-xl bg-indigo-500/10 dark:bg-indigo-400/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0">
+                      <div className="w-12 h-12 rounded-xl bg-[#FBBA00]/10 text-[#FBBA00] flex items-center justify-center flex-shrink-0">
                         <User className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-slate-950 dark:text-white truncate">
+                          <h3 className="font-semibold text-slate-950 truncate">
                             {bk.guest_name}
                           </h3>
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500 font-medium">
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-[#FBBA00]/10 text-[#FBBA00] font-medium">
                             {mt?.title || "Custom Meeting"}
                           </span>
                         </div>
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-zinc-400 mt-1">
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 mt-1">
                           <span className="flex items-center gap-1">
                             <Mail className="w-3.5 h-3.5 text-slate-400" />
                             {bk.guest_email}
                           </span>
-                          <span className="font-medium text-slate-800 dark:text-zinc-300">
+                          <span className="font-medium text-slate-800">
                             {formattedDate} @ {formattedTime}
                           </span>
                         </div>
                         {bk.guest_notes && (
-                          <p className="text-xs text-slate-400 mt-2 bg-slate-100/30 dark:bg-zinc-800/20 p-2 rounded-lg italic">
+                          <p className="text-xs text-slate-500 mt-2 bg-slate-50 border border-slate-100 p-2 rounded-lg italic">
                             &ldquo;{bk.guest_notes}&rdquo;
                           </p>
                         )}
@@ -196,7 +196,7 @@ export default function AnalyticsPage() {
                       {bk.meet_link && (
                         <Link href={bk.meet_link} target="_blank">
                           <Button variant="secondary" size="sm" className="gap-1.5 rounded-lg py-2">
-                            <Video className="w-4 h-4 text-indigo-500" /> Join Meet <ExternalLink className="w-3 h-3" />
+                            <Video className="w-4 h-4 text-[#FBBA00]" /> Join Meet <ExternalLink className="w-3 h-3" />
                           </Button>
                         </Link>
                       )}
@@ -220,7 +220,7 @@ export default function AnalyticsPage() {
       {/* Cancelled Bookings log */}
       {cancelledBookingsCount > 0 && (
         <div className="flex flex-col gap-3">
-          <h3 className="text-sm font-semibold text-slate-500 dark:text-zinc-500 uppercase tracking-wider pl-1">
+          <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider pl-1">
             Cancelled Bookings ({cancelledBookingsCount})
           </h3>
           <div className="flex flex-col gap-2 opacity-60">
@@ -229,7 +229,7 @@ export default function AnalyticsPage() {
               .map((bk) => (
                 <div
                   key={bk.id}
-                  className="flex items-center justify-between p-3.5 rounded-xl border border-border/20 text-xs text-slate-500 dark:text-zinc-500"
+                  className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 text-xs text-slate-500"
                 >
                   <span className="font-medium">{bk.guest_name} ({bk.guest_email})</span>
                   <span>{format(new Date(bk.start_time), "MMM d, h:mm a")}</span>

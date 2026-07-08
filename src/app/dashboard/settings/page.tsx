@@ -104,10 +104,10 @@ export default function SettingsPage() {
     <div className="flex flex-col gap-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
           Account Settings
         </h1>
-        <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">
+        <p className="text-sm text-slate-500 mt-1">
           Customize your profile, link slug, and integrations.
         </p>
       </div>
@@ -117,8 +117,8 @@ export default function SettingsPage() {
         <div className="lg:col-span-2">
           <Card variant="glass" className="p-6">
             <form onSubmit={handleSave} className="flex flex-col gap-5">
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                <Settings className="w-5 h-5 text-indigo-500" /> Profile Details
+              <h2 className="text-lg font-semibold text-slate-900 mb-2 flex items-center gap-2">
+                <Settings className="w-5 h-5 text-[var(--primary)]" /> Profile Details
               </h2>
 
               <Input
@@ -143,10 +143,10 @@ export default function SettingsPage() {
                   <select
                     value={timezone}
                     onChange={(e) => setTimezone(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl text-sm text-slate-900 dark:text-white glass-input transition-all"
+                    className="w-full px-4 py-3 rounded-xl text-sm text-slate-900 glass-input transition-all"
                   >
                     {TIMEZONES.map((tz) => (
-                      <option key={tz} value={tz} className="dark:bg-zinc-900">
+                      <option key={tz} value={tz}>
                         {tz}
                       </option>
                     ))}
@@ -162,7 +162,7 @@ export default function SettingsPage() {
 
               <hr className="border-border/50 my-2" />
               
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
                 <ShieldAlert className="w-4 h-4 text-amber-500" /> Security
               </h3>
 
@@ -197,16 +197,16 @@ export default function SettingsPage() {
         <div className="lg:col-span-1">
           <Card variant="glass" className="p-6 h-full flex flex-col justify-between">
             <div className="flex flex-col gap-4">
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-indigo-500" /> Integrations
+              <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-[var(--primary)]" /> Integrations
               </h2>
-              <p className="text-sm text-slate-500 dark:text-zinc-400 leading-relaxed">
+              <p className="text-sm text-slate-500 leading-relaxed">
                 Connect your account to external calendar networks to block busy times and schedule invites automatically.
               </p>
 
-              <div className="p-4 rounded-xl border border-border/30 bg-slate-100/20 dark:bg-zinc-800/10 flex flex-col gap-3 mt-2">
+              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-col gap-3 mt-2 shadow-inner">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-sm text-slate-900 dark:text-white">
+                  <span className="font-semibold text-sm text-slate-900">
                     Google Calendar
                   </span>
                   {googleConnected ? (
@@ -219,7 +219,7 @@ export default function SettingsPage() {
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-slate-500 dark:text-zinc-400">
+                <p className="text-xs text-slate-500">
                   Allows automatic insertion of meetings and Google Meet URL creations.
                 </p>
               </div>
@@ -229,7 +229,7 @@ export default function SettingsPage() {
               {googleConnected ? (
                 <Button
                   variant="secondary"
-                  className="w-full text-red-500 border border-red-500/10 hover:bg-red-500/5 dark:hover:bg-red-500/10"
+                  className="w-full text-red-500 border border-red-500/20 hover:bg-red-500/5"
                   onClick={handleDisconnectGoogle}
                 >
                   Disconnect Google
@@ -237,7 +237,7 @@ export default function SettingsPage() {
               ) : (
                 <Button
                   variant="primary"
-                  className="w-full bg-indigo-600 hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400"
+                  className="w-full"
                   onClick={handleConnectGoogle}
                   disabled={connectingGoogle}
                 >

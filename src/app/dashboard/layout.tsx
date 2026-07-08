@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { useTheme } from "@/components/providers/ThemeProvider";
+import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import {
@@ -13,9 +13,6 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Moon,
-  Sun,
-  User,
   ExternalLink,
   ChevronRight,
 } from "lucide-react";
@@ -26,7 +23,6 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { user, loading, signOut } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -82,17 +78,12 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <aside className="w-64 border-r border-border/40 p-6 flex flex-col justify-between relative z-10 glass">
         <div className="flex flex-col gap-8">
-          <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-[var(--primary)] text-black border border-black flex items-center justify-center font-bold text-lg shadow-sm">
-              P
-            </div>
-            <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">
-              Palsa
-            </span>
+          <Link href="/dashboard" className="flex items-center group mb-4">
+            <Logo />
           </Link>
 
           {/* User profile card */}
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-100/40 dark:bg-zinc-800/40 border border-border/20">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200 shadow-sm">
             {user.avatar_url ? (
               <img
                 src={user.avatar_url}
@@ -100,18 +91,18 @@ export default function DashboardLayout({
                 className="w-10 h-10 rounded-full object-cover border border-slate-300"
               />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-[var(--primary)] flex items-center justify-center text-black font-semibold border border-black">
+              <div className="w-10 h-10 rounded-full bg-[var(--primary)] flex items-center justify-center text-[#111111] font-semibold">
                 {user.full_name.charAt(0)}
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+              <p className="text-sm font-semibold text-slate-900 truncate">
                 {user.full_name}
               </p>
               <Link
                 href={`/${user.username}`}
                 target="_blank"
-                className="text-xs text-[var(--accent-foreground)] hover:opacity-80 flex items-center gap-1 mt-0.5 transition-colors group"
+                className="text-xs text-[var(--primary)] hover:text-[#EAA800] flex items-center gap-1 mt-0.5 transition-colors group"
               >
                 Public page <ExternalLink className="w-3 h-3 group-hover:translate-x-[1px] transition-transform" />
               </Link>
@@ -127,19 +118,19 @@ export default function DashboardLayout({
                   <div
                     className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all group cursor-pointer ${
                       isActive
-                        ? "bg-[var(--primary)] text-black border border-black shadow-sm"
-                        : "hover:bg-slate-100/80 dark:hover:bg-zinc-800/80 text-slate-600 dark:text-zinc-400 border border-transparent"
+                        ? "bg-[var(--primary)] text-[#111111] shadow-sm"
+                        : "hover:bg-slate-100 text-slate-600 border border-transparent hover:border-slate-200"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <item.icon className="w-5 h-5" />
+                      <item.icon className={`w-5 h-5 ${isActive ? "text-[#111111]" : "text-slate-400 group-hover:text-slate-600"}`} />
                       <span>{item.name}</span>
                     </div>
                     <ChevronRight
                       className={`w-4 h-4 transition-transform group-hover:translate-x-[2px] ${
                         isActive
-                          ? "text-black"
-                          : "text-slate-400 dark:text-zinc-600 opacity-0 group-hover:opacity-100"
+                          ? "text-[#111111]"
+                          : "text-slate-400 opacity-0 group-hover:opacity-100"
                       }`}
                     />
                   </div>
@@ -150,28 +141,9 @@ export default function DashboardLayout({
         </div>
 
         {/* Footer actions */}
-        <div className="flex flex-col gap-3">
-          <Button
+        <div className="flex flex-col gap-3">          <Button
             variant="ghost"
-            className="w-full justify-start gap-3 rounded-xl"
-            onClick={toggleTheme}
-          >
-            {theme === "light" ? (
-              <>
-                <Moon className="w-5 h-5" />
-                <span>Dark Mode</span>
-              </>
-            ) : (
-              <>
-                <Sun className="w-5 h-5" />
-                <span>Light Mode</span>
-              </>
-            )}
-          </Button>
-
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 text-red-500 hover:bg-red-500/5 dark:hover:bg-red-500/10 rounded-xl"
+            className="w-full justify-start gap-3 text-red-500 hover:bg-red-50 rounded-xl"
             onClick={signOut}
           >
             <LogOut className="w-5 h-5" />
