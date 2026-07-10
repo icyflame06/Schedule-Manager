@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { Profile, MeetingType, Availability, Booking } from "@/types";
 import { db } from "@/lib/db";
 import { processGoogleBooking, fetchGoogleCalendarBusySlots } from "@/app/actions/booking";
@@ -293,56 +294,87 @@ export default function BookingPage() {
 
   if (isSuccess && successBooking) {
     return (
-      <div className="min-h-screen bg-background relative flex flex-col items-center justify-center p-6">
+      <div className="min-h-screen bg-background relative flex flex-col items-center justify-center py-12 px-6">
         <div className="absolute top-0 right-0 w-[45%] h-[45%] rounded-full bg-[#FBBA00]/5 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[45%] h-[45%] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
 
-        <div className="relative z-10 w-full max-w-lg mx-auto flex flex-col items-center">
-          <div className="relative w-full aspect-[4/5] max-w-[400px]">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="relative z-10 w-[95%] md:w-[700px] lg:w-[850px] mx-auto flex flex-col items-center"
+        >
+          <motion.div 
+            animate={{ y: [0, -10, 0] }}
+            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+            className="relative w-full"
+          >
             <img 
               src="/poli_confirm_booking.png" 
               alt="Booking Confirmed Bubble" 
-              className="absolute inset-0 w-full h-full object-contain"
+              className="w-full h-auto block pointer-events-none"
             />
             {/* Content area positioned inside the speech bubble */}
-            <div className="absolute top-[8%] left-[12%] right-[12%] bottom-[25%] flex flex-col items-center justify-center p-4 text-center overflow-y-auto no-scrollbar">
-              <h1 className="text-2xl font-extrabold text-slate-900 mb-2">Booking Confirmed!</h1>
-              <p className="text-xs text-slate-600 mb-4 leading-relaxed font-medium">
-                Your meeting with <span className="font-bold text-slate-900">{profile.full_name}</span> is set.
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="absolute top-[8%] left-[10%] right-[10%] bottom-[28%] flex flex-col items-center justify-center p-4 text-center overflow-y-auto no-scrollbar"
+            >
+              <h1 className="text-[22px] md:text-[28px] lg:text-[34px] font-bold text-slate-900 mb-2">
+                Booking Confirmed! 🎉
+              </h1>
+              <p className="text-[14px] md:text-[16px] lg:text-[18px] text-slate-700 mb-6 font-normal">
+                Your meeting with <strong className="font-bold text-slate-900">{profile.full_name}</strong> has been successfully scheduled.
               </p>
 
-              <div className="w-full bg-slate-50/80 backdrop-blur-sm p-4 rounded-xl border border-slate-200/60 shadow-inner flex flex-col gap-3 text-xs text-left">
+              <div className="w-full max-w-sm xl:max-w-md mx-auto flex flex-col gap-3 text-left text-[14px] md:text-[16px] lg:text-[18px]">
                 <div className="flex justify-between items-center border-b border-slate-200/60 pb-2">
-                  <span className="text-slate-500 font-semibold uppercase tracking-wider">Meeting</span>
-                  <span className="font-bold text-slate-900 truncate max-w-[130px]">{meetingType.title}</span>
+                  <span className="font-semibold text-slate-600">Meeting</span>
+                  <span className="font-normal text-slate-900 truncate max-w-[180px] sm:max-w-xs">{meetingType.title}</span>
                 </div>
                 <div className="flex justify-between items-center border-b border-slate-200/60 pb-2">
-                  <span className="text-slate-500 font-semibold uppercase tracking-wider">Time</span>
-                  <span className="font-bold text-slate-900 truncate max-w-[130px]">
-                    {format(new Date(successBooking.start_time), "MMM d, h:mm a")}
+                  <span className="font-semibold text-slate-600">Date</span>
+                  <span className="font-normal text-slate-900">
+                    {format(new Date(successBooking.start_time), "MMMM d, yyyy")}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center border-b border-slate-200/60 pb-2">
+                  <span className="font-semibold text-slate-600">Time</span>
+                  <span className="font-normal text-slate-900">
+                    {format(new Date(successBooking.start_time), "h:mm a")} ({guestTimezone})
+                  </span>
+                </div>
+                <div className="flex justify-between items-center border-b border-slate-200/60 pb-2">
+                  <span className="font-semibold text-slate-600">Location</span>
+                  <span className="font-normal text-slate-900">
+                    {meetingType.location_type === "google_meet" ? "Google Meet" : meetingType.location_type}
                   </span>
                 </div>
                 {successBooking.meet_link && (
                   <div className="flex flex-col gap-1 pt-1">
-                    <span className="text-slate-500 font-semibold uppercase tracking-wider">Meet Url</span>
+                    <span className="font-semibold text-slate-600">Meeting Link</span>
                     <a
                       href={successBooking.meet_link}
                       target="_blank"
                       rel="noreferrer"
-                      className="font-bold text-indigo-600 hover:underline truncate"
+                      className="font-normal text-indigo-600 hover:underline truncate"
                     >
-                      {successBooking.meet_link}
+                      {successBooking.meet_link.length > 40 ? successBooking.meet_link.substring(0, 40) + "..." : successBooking.meet_link}
                     </a>
                   </div>
                 )}
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          <Button className="w-full mt-6 max-w-xs shadow-lg hover:shadow-xl transition-all" size="lg" onClick={() => router.push(`/${profile.username}`)}>
-            Book another session
-          </Button>
-        </div>
+          <button 
+            onClick={() => router.push(`/${profile.username}`)}
+            className="mt-8 px-8 py-4 bg-[#FBBA00] text-slate-900 font-bold text-lg md:text-xl rounded-[16px] hover:-translate-y-1 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out"
+          >
+            Book Another Session
+          </button>
+        </motion.div>
       </div>
     );
   }
