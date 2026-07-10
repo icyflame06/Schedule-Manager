@@ -294,7 +294,7 @@ export default function BookingPage() {
 
   if (isSuccess && successBooking) {
     return (
-      <div className="min-h-screen bg-background relative flex flex-col items-center justify-center py-12 px-6">
+      <div className="min-h-[100dvh] bg-background relative flex flex-col items-center justify-center p-4 sm:p-8 overflow-hidden">
         <div className="absolute top-0 right-0 w-[45%] h-[45%] rounded-full bg-[#FBBA00]/5 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[45%] h-[45%] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
 
@@ -302,7 +302,7 @@ export default function BookingPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="relative z-10 w-[95%] md:w-[700px] lg:w-[850px] mx-auto flex flex-col items-center"
+          className="relative z-10 w-full max-w-[95%] sm:max-w-[85%] md:max-w-[800px] lg:max-w-[1000px] xl:max-w-[1200px] mx-auto flex flex-col items-center"
         >
           <motion.div 
             animate={{ y: [0, -10, 0] }}
@@ -312,26 +312,26 @@ export default function BookingPage() {
             <img 
               src="/poli_confirm_booking.png" 
               alt="Booking Confirmed Bubble" 
-              className="w-full h-auto block pointer-events-none"
+              className="w-full h-auto block pointer-events-none mx-auto"
             />
             {/* Content area positioned inside the speech bubble */}
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.6 }}
-              className="absolute top-[8%] left-[10%] right-[10%] bottom-[28%] flex flex-col items-center justify-center p-4 text-center overflow-y-auto no-scrollbar"
+              className="absolute top-[8%] left-[10%] right-[10%] bottom-[28%] flex flex-col items-center justify-center p-2 sm:p-4 text-center overflow-y-auto no-scrollbar"
             >
-              <h1 className="text-[22px] md:text-[28px] lg:text-[34px] font-bold text-slate-900 mb-2">
+              <h1 className="text-[20px] sm:text-[24px] md:text-[30px] lg:text-[36px] font-bold text-slate-900 mb-2">
                 Booking Confirmed! 🎉
               </h1>
-              <p className="text-[14px] md:text-[16px] lg:text-[18px] text-slate-700 mb-6 font-normal">
+              <p className="text-[13px] sm:text-[15px] md:text-[17px] lg:text-[20px] text-slate-700 mb-4 sm:mb-8 font-normal">
                 Your meeting with <strong className="font-bold text-slate-900">{profile.full_name}</strong> has been successfully scheduled.
               </p>
 
-              <div className="w-full max-w-sm xl:max-w-md mx-auto flex flex-col gap-3 text-left text-[14px] md:text-[16px] lg:text-[18px]">
+              <div className="w-full max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto flex flex-col gap-3 sm:gap-4 text-left text-[13px] sm:text-[15px] md:text-[17px] lg:text-[20px]">
                 <div className="flex justify-between items-center border-b border-slate-200/60 pb-2">
                   <span className="font-semibold text-slate-600">Meeting</span>
-                  <span className="font-normal text-slate-900 truncate max-w-[180px] sm:max-w-xs">{meetingType.title}</span>
+                  <span className="font-normal text-slate-900 truncate max-w-[140px] sm:max-w-[180px] md:max-w-xs">{meetingType.title}</span>
                 </div>
                 <div className="flex justify-between items-center border-b border-slate-200/60 pb-2">
                   <span className="font-semibold text-slate-600">Date</span>
@@ -352,7 +352,7 @@ export default function BookingPage() {
                   </span>
                 </div>
                 {successBooking.meet_link && (
-                  <div className="flex flex-col gap-1 pt-1">
+                  <div className="flex flex-col gap-1 sm:gap-2 pt-1 sm:pt-2">
                     <span className="font-semibold text-slate-600">Meeting Link</span>
                     <a
                       href={successBooking.meet_link}
@@ -367,14 +367,15 @@ export default function BookingPage() {
               </div>
             </motion.div>
           </motion.div>
-
-          <button 
-            onClick={() => router.push(`/${profile.username}`)}
-            className="mt-8 px-8 py-4 bg-[#FBBA00] text-slate-900 font-bold text-lg md:text-xl rounded-[16px] hover:-translate-y-1 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out"
-          >
-            Book Another Session
-          </button>
         </motion.div>
+
+        {/* Floating Button in Bottom Corner */}
+        <button 
+          onClick={() => router.push(`/${profile.username}`)}
+          className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-50 px-6 py-4 md:px-8 md:py-5 bg-[#FBBA00] text-slate-900 font-bold text-base md:text-xl rounded-[16px] shadow-[0_10px_30px_rgba(251,186,0,0.3)] hover:-translate-y-1 hover:shadow-[0_15px_40px_rgba(251,186,0,0.5)] transition-all duration-300 ease-in-out"
+        >
+          Book Another Session
+        </button>
       </div>
     );
   }
