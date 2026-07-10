@@ -344,6 +344,14 @@ export default function BookingPage() {
           <Button className="w-full mt-2" onClick={() => router.push(`/${profile.username}`)}>
             Book another session
           </Button>
+
+          <div className="w-full flex justify-center mt-4 pt-2">
+            <img 
+              src="/poli-12.png" 
+              alt="Poli Mascot" 
+              className="w-40 md:w-48 h-auto opacity-90 pointer-events-none"
+            />
+          </div>
         </Card>
       </div>
     );
