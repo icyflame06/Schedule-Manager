@@ -19,10 +19,15 @@ const aj = arcjet({
 
 export async function proxy(request: NextRequest) {
   // 1. Arcjet Rate Limiting
-  const decision = await aj.protect(request);
-  
-  if (decision.isDenied()) {
-    return NextResponse.json({ error: "Too Many Requests" }, { status: 429 });
+  if (process.env.ARCJET_KEY && process.env.ARCJET_KEY !== "ajkey_placeholder") {
+    try {
+      const decision = await aj.protect(request);
+      if (decision.isDenied()) {
+        return NextResponse.json({ error: "Too Many Requests" }, { status: 429 });
+      }
+    } catch (e) {
+      console.warn("Arcjet protection failed:", e);
+    }
   }
 
   let supabaseResponse = NextResponse.next({

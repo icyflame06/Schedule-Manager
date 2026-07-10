@@ -564,39 +564,6 @@ export default function BookingPage() {
                   </div>
                 )}
               </div>
-            ) : !loggedInUser ? (
-              // Ask user to login before booking
-              <div className="flex flex-col items-center justify-center text-center p-6 bg-slate-50 rounded-2xl border border-slate-200 gap-5 flex-1 min-h-[300px] shadow-inner">
-                <div className="border-b border-slate-200 pb-3 mb-2 w-full text-left">
-                  <h4 className="font-bold text-xs text-slate-500 uppercase tracking-wider">Selected Slot</h4>
-                  <p className="text-sm font-bold text-slate-900 mt-1">
-                    {format(selectedDate, "MMM d, yyyy")} @ {selectedTime}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedTime(null)}
-                    className="text-xs text-[var(--primary)] hover:underline mt-1 cursor-pointer"
-                  >
-                    Change time
-                  </button>
-                </div>
-
-                <div className="w-12 h-12 rounded-full bg-[#FBBA00]/10 flex items-center justify-center text-[#FBBA00]">
-                  <Globe className="w-6 h-6 animate-pulse" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-slate-900 text-base">Authentication Required</h4>
-                  <p className="text-xs text-slate-500 mt-1 max-w-[240px] leading-relaxed">
-                    To prevent spam, please log in with your Google account to secure this appointment.
-                  </p>
-                </div>
-                <Button
-                  onClick={() => signInWithGoogle(`/book/${username}/${eventSlug}`)}
-                  className="w-full mt-2"
-                >
-                  Continue with Google
-                </Button>
-              </div>
             ) : (
               // Show Booking Confirmation Details Form
               <form onSubmit={handleBookingSubmit} className="flex flex-col gap-4 flex-1">
