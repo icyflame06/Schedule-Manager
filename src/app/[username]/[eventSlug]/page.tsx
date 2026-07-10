@@ -294,7 +294,7 @@ export default function BookingPage() {
 
   if (isSuccess && successBooking) {
     return (
-      <div className="min-h-[100dvh] bg-background relative flex flex-col items-center justify-center p-4 sm:p-8 overflow-hidden">
+      <div className="h-[100dvh] w-[100vw] bg-background relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[45%] h-[45%] rounded-full bg-[#FBBA00]/5 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[45%] h-[45%] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
 
@@ -302,24 +302,24 @@ export default function BookingPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="relative z-10 w-full max-w-[95%] sm:max-w-[85%] md:max-w-[800px] lg:max-w-[1000px] xl:max-w-[1200px] mx-auto flex flex-col items-center"
+          className="absolute inset-0 z-10 w-full h-full flex items-center justify-center"
         >
           <motion.div 
             animate={{ y: [0, -10, 0] }}
             transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-            className="relative w-full"
+            className="relative w-full h-full flex flex-col items-center justify-center"
           >
             <img 
               src="/poli_confirm_booking.png" 
               alt="Booking Confirmed Bubble" 
-              className="w-full h-auto block pointer-events-none mx-auto"
+              className="absolute inset-0 w-full h-full block pointer-events-none object-contain sm:object-cover"
             />
             {/* Content area positioned inside the speech bubble */}
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.6 }}
-              className="absolute top-[8%] left-[10%] right-[10%] bottom-[28%] flex flex-col items-center justify-center p-2 sm:p-4 text-center overflow-y-auto no-scrollbar"
+              className="absolute top-[5%] left-[5%] right-[5%] bottom-[20%] sm:top-[8%] sm:left-[10%] sm:right-[10%] sm:bottom-[28%] flex flex-col items-center justify-center p-2 sm:p-4 text-center overflow-y-auto no-scrollbar"
             >
               <h1 className="text-[20px] sm:text-[24px] md:text-[30px] lg:text-[36px] font-bold text-slate-900 mb-2">
                 Booking Confirmed! 🎉
