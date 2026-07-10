@@ -293,58 +293,56 @@ export default function BookingPage() {
 
   if (isSuccess && successBooking) {
     return (
-      <div className="min-h-screen bg-background relative flex items-center justify-center p-6">
+      <div className="min-h-screen bg-background relative flex flex-col items-center justify-center p-6">
         <div className="absolute top-0 right-0 w-[45%] h-[45%] rounded-full bg-[#FBBA00]/5 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[45%] h-[45%] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
 
-        <Card variant="glass" className="p-8 text-center max-w-lg w-full flex flex-col items-center gap-6 shadow-2xl relative z-10">
-          <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-            <CheckCircle className="w-10 h-10" />
-          </div>
+        <div className="relative z-10 w-full max-w-lg mx-auto flex flex-col items-center">
+          <div className="relative w-full aspect-[4/5] max-w-[400px]">
+            <img 
+              src="/poli_confirm_booking.png" 
+              alt="Booking Confirmed Bubble" 
+              className="absolute inset-0 w-full h-full object-contain"
+            />
+            {/* Content area positioned inside the speech bubble */}
+            <div className="absolute top-[8%] left-[12%] right-[12%] bottom-[25%] flex flex-col items-center justify-center p-4 text-center overflow-y-auto no-scrollbar">
+              <h1 className="text-2xl font-extrabold text-slate-900 mb-2">Booking Confirmed!</h1>
+              <p className="text-xs text-slate-600 mb-4 leading-relaxed font-medium">
+                Your meeting with <span className="font-bold text-slate-900">{profile.full_name}</span> is set.
+              </p>
 
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Booking Confirmed!</h1>
-            <p className="text-sm text-slate-500 mt-2 leading-relaxed">
-              Your meeting with <span className="font-semibold text-slate-800">{profile.full_name}</span> has been scheduled successfully.
-            </p>
-          </div>
-
-          <div className="w-full p-5 rounded-xl border border-slate-200 bg-slate-50 text-left flex flex-col gap-3 text-sm shadow-inner">
-            <div className="flex justify-between border-b border-slate-200 pb-2">
-              <span className="text-slate-500">Meeting:</span>
-              <span className="font-semibold text-slate-900">{meetingType.title}</span>
-            </div>
-            <div className="flex justify-between border-b border-slate-200 pb-2">
-              <span className="text-slate-500">Time:</span>
-              <span className="font-semibold text-slate-900">
-                {format(new Date(successBooking.start_time), "MMMM d, yyyy")} @ {format(new Date(successBooking.start_time), "h:mm a")} ({guestTimezone})
-              </span>
-            </div>
-            <div className="flex justify-between border-b border-slate-200 pb-2">
-              <span className="text-slate-500">Location:</span>
-              <span className="font-semibold text-slate-900">
-                {meetingType.location_type === "google_meet" ? "Google Meet Link" : meetingType.meeting_link}
-              </span>
-            </div>
-            {successBooking.meet_link && (
-              <div className="flex justify-between items-center pt-1">
-                <span className="text-slate-500">Meet Url:</span>
-                <a
-                  href={successBooking.meet_link}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="font-semibold text-indigo-500 hover:underline truncate max-w-[200px]"
-                >
-                  {successBooking.meet_link}
-                </a>
+              <div className="w-full bg-slate-50/80 backdrop-blur-sm p-4 rounded-xl border border-slate-200/60 shadow-inner flex flex-col gap-3 text-xs text-left">
+                <div className="flex justify-between items-center border-b border-slate-200/60 pb-2">
+                  <span className="text-slate-500 font-semibold uppercase tracking-wider">Meeting</span>
+                  <span className="font-bold text-slate-900 truncate max-w-[130px]">{meetingType.title}</span>
+                </div>
+                <div className="flex justify-between items-center border-b border-slate-200/60 pb-2">
+                  <span className="text-slate-500 font-semibold uppercase tracking-wider">Time</span>
+                  <span className="font-bold text-slate-900 truncate max-w-[130px]">
+                    {format(new Date(successBooking.start_time), "MMM d, h:mm a")}
+                  </span>
+                </div>
+                {successBooking.meet_link && (
+                  <div className="flex flex-col gap-1 pt-1">
+                    <span className="text-slate-500 font-semibold uppercase tracking-wider">Meet Url</span>
+                    <a
+                      href={successBooking.meet_link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-bold text-indigo-600 hover:underline truncate"
+                    >
+                      {successBooking.meet_link}
+                    </a>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
 
-          <Button className="w-full mt-2" onClick={() => router.push(`/${profile.username}`)}>
+          <Button className="w-full mt-6 max-w-xs shadow-lg hover:shadow-xl transition-all" size="lg" onClick={() => router.push(`/${profile.username}`)}>
             Book another session
           </Button>
-        </Card>
+        </div>
       </div>
     );
   }
