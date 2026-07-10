@@ -294,7 +294,7 @@ export default function BookingPage() {
 
   if (isSuccess && successBooking) {
     return (
-      <div className="min-h-screen bg-background relative flex flex-col items-center justify-center p-6 overflow-hidden">
+      <div className="h-[100dvh] w-[100vw] bg-background relative flex flex-col items-center justify-center p-4 sm:p-6 overflow-hidden">
         <div className="absolute top-0 right-0 w-[45%] h-[45%] rounded-full bg-[#FBBA00]/5 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[45%] h-[45%] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
 
@@ -302,81 +302,84 @@ export default function BookingPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="relative z-10 w-full flex flex-col items-center gap-8"
+          className="relative z-10 w-full h-full flex flex-col items-center justify-center gap-[40px]"
         >
           <motion.div 
             animate={{ y: [0, -10, 0] }}
             transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-            className="relative w-full max-w-[850px] mx-auto"
+            className="relative h-auto max-h-[70dvh] max-w-[100%] flex shrink-0 justify-center"
           >
-            <img 
-              src="/poli_confirm_booking.png" 
-              alt="Booking Confirmed Bubble" 
-              className="w-full h-auto block pointer-events-none"
-            />
-            
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-              className="absolute overflow-y-auto no-scrollbar flex flex-col items-start justify-start text-left p-4 sm:p-6 lg:p-8"
-              style={{
-                top: "10%",
-                left: "15%",
-                width: "70%",
-                height: "68%"
-              }}
-            >
-              <h1 className="text-[22px] sm:text-[28px] lg:text-[34px] font-bold text-slate-900 mb-2">
-                Booking Confirmed! 🎉
-              </h1>
-              <p className="text-[14px] sm:text-[16px] lg:text-[18px] text-slate-700 mb-6 font-normal">
-                Your meeting with <strong className="font-bold text-slate-900">{profile.full_name}</strong> has been successfully scheduled.
-              </p>
+            {/* The inline-block wrapper ensures perfectly tight fit around the responsive image for absolute positioning */}
+            <div className="relative inline-block h-auto w-auto max-h-full max-w-full">
+              <img 
+                src="/poli_confirm_booking.png" 
+                alt="Booking Confirmed Bubble" 
+                className="block max-h-[70dvh] max-w-[100%] w-auto h-auto object-contain pointer-events-none"
+              />
+              
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
+                className="absolute overflow-y-auto no-scrollbar flex flex-col items-start justify-start text-left p-2 sm:p-4 lg:p-6"
+                style={{
+                  top: "10%",
+                  left: "20%",
+                  width: "60%",
+                  height: "68%"
+                }}
+              >
+                <h1 className="text-[18px] sm:text-[22px] lg:text-[26px] font-bold text-slate-900 mb-2">
+                  Booking Confirmed! 🎉
+                </h1>
+                <p className="text-[13px] sm:text-[14px] lg:text-[16px] text-slate-700 mb-6 font-normal">
+                  Your meeting with <strong className="font-bold text-slate-900">{profile.full_name}</strong> has been successfully scheduled.
+                </p>
 
-              <div className="w-full flex flex-col gap-3 sm:gap-4 text-left text-[14px] sm:text-[16px] lg:text-[18px]">
-                <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-2">
-                  <span className="font-semibold text-slate-600 uppercase text-xs tracking-wider">Meeting Name</span>
-                  <span className="text-slate-900 font-normal">{meetingType.title}</span>
-                </div>
-                <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-2">
-                  <span className="font-semibold text-slate-600 uppercase text-xs tracking-wider">Date</span>
-                  <span className="text-slate-900 font-normal">
-                    {format(new Date(successBooking.start_time), "MMMM d, yyyy")}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-2">
-                  <span className="font-semibold text-slate-600 uppercase text-xs tracking-wider">Time</span>
-                  <span className="text-slate-900 font-normal">
-                    {format(new Date(successBooking.start_time), "h:mm a")} ({guestTimezone})
-                  </span>
-                </div>
-                <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-2">
-                  <span className="font-semibold text-slate-600 uppercase text-xs tracking-wider">Location</span>
-                  <span className="text-slate-900 font-normal">
-                    {meetingType.location_type === "google_meet" ? "Google Meet" : meetingType.location_type}
-                  </span>
-                </div>
-                {successBooking.meet_link && (
-                  <div className="flex flex-col gap-1 pt-1">
-                    <span className="font-semibold text-slate-600 uppercase text-xs tracking-wider">Google Meet Link</span>
-                    <a
-                      href={successBooking.meet_link}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-indigo-600 hover:underline break-words font-normal"
-                    >
-                      {successBooking.meet_link}
-                    </a>
+                <div className="w-full flex flex-col gap-2 sm:gap-3 lg:gap-4 text-left text-[12px] sm:text-[13px] lg:text-[15px]">
+                  <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-2">
+                    <span className="font-semibold text-slate-600 uppercase text-[10px] sm:text-xs tracking-wider">Meeting Name</span>
+                    <span className="text-slate-900 font-normal">{meetingType.title}</span>
                   </div>
-                )}
-              </div>
-            </motion.div>
+                  <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-2">
+                    <span className="font-semibold text-slate-600 uppercase text-[10px] sm:text-xs tracking-wider">Date</span>
+                    <span className="text-slate-900 font-normal">
+                      {format(new Date(successBooking.start_time), "MMMM d, yyyy")}
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-2">
+                    <span className="font-semibold text-slate-600 uppercase text-[10px] sm:text-xs tracking-wider">Time</span>
+                    <span className="text-slate-900 font-normal">
+                      {format(new Date(successBooking.start_time), "h:mm a")} ({guestTimezone})
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-2">
+                    <span className="font-semibold text-slate-600 uppercase text-[10px] sm:text-xs tracking-wider">Location</span>
+                    <span className="text-slate-900 font-normal">
+                      {meetingType.location_type === "google_meet" ? "Google Meet" : meetingType.location_type}
+                    </span>
+                  </div>
+                  {successBooking.meet_link && (
+                    <div className="flex flex-col gap-1 pt-1">
+                      <span className="font-semibold text-slate-600 uppercase text-[10px] sm:text-xs tracking-wider">Google Meet Link</span>
+                      <a
+                        href={successBooking.meet_link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-indigo-600 hover:underline break-words font-normal"
+                      >
+                        {successBooking.meet_link}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </div>
           </motion.div>
 
           <button 
             onClick={() => router.push(`/${profile.username}`)}
-            className="px-8 py-4 bg-[#FBBA00] text-slate-900 font-bold text-[16px] sm:text-[18px] lg:text-[20px] rounded-[16px] shadow-[0_10px_30px_rgba(251,186,0,0.3)] hover:-translate-y-1 hover:shadow-[0_15px_40px_rgba(251,186,0,0.5)] transition-all duration-300 ease-in-out"
+            className="shrink-0 px-8 py-4 bg-[#FBBA00] text-slate-900 font-bold text-[16px] sm:text-[18px] lg:text-[20px] rounded-[16px] shadow-[0_10px_30px_rgba(251,186,0,0.3)] hover:-translate-y-1 hover:shadow-[0_15px_40px_rgba(251,186,0,0.5)] transition-all duration-300 ease-in-out"
           >
             Book Another Session
           </button>
