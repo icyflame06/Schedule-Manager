@@ -388,7 +388,18 @@ export const db = {
     if (!isSupabaseConfigured()) {
       return getLocalStorage<Integration | null>("db_google_integration", null);
     }
-    const { data, error } = await supabase
+    
+    // Attempt to use admin client to bypass RLS if this is called from a Server Action by a guest
+    let client = supabase;
+    if (typeof window === "undefined") {
+      const { getSupabaseAdmin } = await import("./supabase/admin");
+      const adminClient = getSupabaseAdmin();
+      if (adminClient) {
+        client = adminClient;
+      }
+    }
+
+    const { data, error } = await client
       .from("integrations")
       .select("*")
       .eq("user_id", userId)
