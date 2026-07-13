@@ -32,6 +32,7 @@ export const AvailabilityListSchema = z.array(AvailabilitySchema);
 
 export const BookingSchema = z.object({
   meeting_type_id: z.string().uuid(),
+  host_user_id: z.string().uuid(),
   guest_name: z.string().min(1).max(100),
   guest_email: z.string().email(),
   guest_notes: z.string().max(1000).optional(),
