@@ -48,7 +48,7 @@ export async function getHostGoogleAccessToken(hostUserId: string): Promise<stri
 
   if (credential) {
     // If expired or close to expiry (within 60 seconds), refresh it
-    const expiryTime = credential.expires_at ? new Date(credential.expires_at).getTime() : 0;
+    const expiryTime = credential.expires_at ? Number(credential.expires_at) : 0;
     const isExpired = expiryTime ? (Date.now() >= expiryTime - 60000) : false;
 
     if (isExpired && credential.refresh_token) {
