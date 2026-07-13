@@ -163,7 +163,7 @@ export async function createGoogleCalendarEvent(
   }
 
   try {
-    const eventBody = {
+    const eventBody: any = {
       summary: `${meetingType.title}: ${booking.guest_name}`,
       description: `Scheduled via Palsa.\n\nGuest Notes: ${booking.guest_notes || "None"}`,
       start: {
@@ -177,15 +177,18 @@ export async function createGoogleCalendarEvent(
       attendees: [
         { email: booking.guest_email, displayName: booking.guest_name }
       ],
-      conferenceData: {
+    };
+
+    if (meetingType.location_type === "google_meet") {
+      eventBody.conferenceData = {
         createRequest: {
           requestId: `chronos-meet-${Date.now()}`,
           conferenceSolutionKey: {
             type: "hangoutsMeet",
           },
         },
-      },
-    };
+      };
+    }
 
     const response = await fetch(
       "https://www.googleapis.com/calendar/v3/calendars/primary/events?conferenceDataVersion=1",
