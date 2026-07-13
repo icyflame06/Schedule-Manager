@@ -320,8 +320,16 @@ export default function BookingPage() {
             </div>
             <div className="flex justify-between border-b border-slate-200 pb-2">
               <span className="text-slate-500">Location:</span>
-              <span className="font-semibold text-slate-900">
-                {meetingType.location_type === "google_meet" ? "Google Meet Link" : meetingType.meeting_link}
+              <span className="font-semibold text-slate-900 text-right">
+                {meetingType.location_type === "google_meet" ? (
+                  "Google Meet Link"
+                ) : meetingType.meeting_link?.startsWith("http") ? (
+                  <a href={meetingType.meeting_link} target="_blank" rel="noreferrer" className="text-indigo-500 hover:underline">
+                    {meetingType.meeting_link}
+                  </a>
+                ) : (
+                  meetingType.meeting_link
+                )}
               </span>
             </div>
             {successBooking.meet_link && (

@@ -27,9 +27,17 @@ function guestEmailHtml(
   host: Profile
 ) {
   const start = formatDateTime(booking.start_time, "Asia/Kolkata");
-  const meetLinkBlock = booking.meet_link
-    ? `<a href="${booking.meet_link}" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#4f46e5;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">Join Google Meet</a>`
-    : "";
+  let meetLinkBlock = "";
+  if (booking.meet_link) {
+    meetLinkBlock = `<a href="${booking.meet_link}" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#4f46e5;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">Join Google Meet</a>`;
+  } else if (meetingType.location_type === "custom" && meetingType.meeting_link) {
+    const isUrl = meetingType.meeting_link.startsWith("http");
+    meetLinkBlock = isUrl 
+      ? `<a href="${meetingType.meeting_link}" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#4f46e5;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">Join Meeting</a>`
+      : `<div style="margin-top:16px;padding:12px;background:#f1f5f9;border-radius:8px;font-weight:600;font-size:14px;color:#333;"><strong>Location:</strong> ${meetingType.meeting_link}</div>`;
+  } else if (meetingType.location_type === "phone") {
+    meetLinkBlock = `<div style="margin-top:16px;padding:12px;background:#f1f5f9;border-radius:8px;font-weight:600;font-size:14px;color:#333;"><strong>Phone Call</strong></div>`;
+  }
 
   return `
 <!DOCTYPE html>
@@ -92,9 +100,17 @@ function hostEmailHtml(
   host: Profile
 ) {
   const start = formatDateTime(booking.start_time, "Asia/Kolkata");
-  const meetLinkBlock = booking.meet_link
-    ? `<a href="${booking.meet_link}" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#4f46e5;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">Join Google Meet</a>`
-    : "";
+  let meetLinkBlock = "";
+  if (booking.meet_link) {
+    meetLinkBlock = `<a href="${booking.meet_link}" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#059669;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">Join Google Meet</a>`;
+  } else if (meetingType.location_type === "custom" && meetingType.meeting_link) {
+    const isUrl = meetingType.meeting_link.startsWith("http");
+    meetLinkBlock = isUrl 
+      ? `<a href="${meetingType.meeting_link}" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#059669;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">Join Meeting</a>`
+      : `<div style="margin-top:16px;padding:12px;background:#f1f5f9;border-radius:8px;font-weight:600;font-size:14px;color:#333;"><strong>Location:</strong> ${meetingType.meeting_link}</div>`;
+  } else if (meetingType.location_type === "phone") {
+    meetLinkBlock = `<div style="margin-top:16px;padding:12px;background:#f1f5f9;border-radius:8px;font-weight:600;font-size:14px;color:#333;"><strong>Phone Call</strong></div>`;
+  }
 
   return `
 <!DOCTYPE html>
