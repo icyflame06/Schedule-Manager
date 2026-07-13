@@ -332,19 +332,7 @@ export default function BookingPage() {
                 )}
               </span>
             </div>
-            {successBooking.meet_link && (
-              <div className="flex justify-between items-center pt-1">
-                <span className="text-slate-500">Meet Url:</span>
-                <a
-                  href={successBooking.meet_link}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="font-semibold text-indigo-500 hover:underline truncate max-w-[200px]"
-                >
-                  {successBooking.meet_link}
-                </a>
-              </div>
-            )}
+
           </div>
 
           <Button className="w-full mt-2" onClick={() => router.push(`/${profile.username}`)}>
