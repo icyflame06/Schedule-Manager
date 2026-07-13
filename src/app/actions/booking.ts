@@ -48,3 +48,38 @@ export async function cancelGoogleCalendarEvent(
     return false;
   }
 }
+
+/**
+ * Fetch bookings for a host user, bypassing RLS so unauthenticated guests
+ * can see which slots are already taken.
+ */
+export async function fetchHostBookings(
+  hostUserId: string
+): Promise<Booking[]> {
+  noStore();
+  try {
+    const { getSupabaseAdmin } = await import("@/lib/supabase/admin");
+    const admin = getSupabaseAdmin();
+    if (!admin) {
+      console.warn("[Bookings] No admin client available – returning empty bookings");
+      return [];
+    }
+
+    const { data, error } = await admin
+      .from("bookings")
+      .select("*")
+      .eq("host_user_id", hostUserId)
+      .eq("status", "scheduled")
+      .order("start_time", { ascending: true });
+
+    if (error) {
+      console.error("[Bookings] Failed to fetch host bookings:", error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error("[Bookings] Error fetching host bookings:", error);
+    return [];
+  }
+}

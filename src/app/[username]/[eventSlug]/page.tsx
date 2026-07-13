@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Profile, MeetingType, Availability, Booking } from "@/types";
 import { db } from "@/lib/db";
-import { processGoogleBooking, fetchGoogleCalendarBusySlots } from "@/app/actions/booking";
+import { processGoogleBooking, fetchGoogleCalendarBusySlots, fetchHostBookings } from "@/app/actions/booking";
 import { sendBookingConfirmationEmails } from "@/app/actions/email";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -86,7 +86,7 @@ export default function BookingPage() {
 
           const [availData, bkData] = await Promise.all([
             db.getAvailability(response.profile.id),
-            db.getBookings(response.profile.id),
+            fetchHostBookings(response.profile.id),
           ]);
           setAvailabilities(availData);
           setExistingBookings(bkData);
