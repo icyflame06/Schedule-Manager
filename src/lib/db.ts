@@ -327,11 +327,7 @@ export const db = {
   createBooking: async (booking: Omit<Booking, "id" | "status" | "created_at">): Promise<Booking> => {
     const isMock = !isSupabaseConfigured();
 
-    // Auto generate Meet link if location type is google_meet
     let meet_link = booking.meet_link;
-    if (!meet_link && isMock) {
-      meet_link = `https://meet.google.com/${Math.random().toString(36).substr(2, 3)}-${Math.random().toString(36).substr(2, 4)}-${Math.random().toString(36).substr(2, 3)}`;
-    }
 
     if (isMock) {
       const bookings = getLocalStorage<Booking[]>("db_bookings", []);
