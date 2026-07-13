@@ -88,7 +88,7 @@ export default function DashboardLayout({
             )}
             {isCollapsed && (
               <Link href="/dashboard" className="flex items-center group mx-auto">
-                <Logo showText={false} />
+                <img src="/poli-02.png" alt="Collapsed Logo" className="w-12 h-auto object-contain drop-shadow-sm" />
               </Link>
             )}
             <button 
