@@ -77,15 +77,6 @@ export default function SettingsPage() {
     setConnectingGoogle(true);
     try {
       await signInWithGoogle();
-      // In mock/demo mode, save local dummy credential
-      if (user) {
-        await db.setGoogleCredential({
-          user_id: user.id,
-          provider: "google",
-          access_token: "mock-access-token",
-        });
-        setGoogleConnected(true);
-      }
     } catch (e) {
       alert("Failed to connect Google Calendar.");
     } finally {
