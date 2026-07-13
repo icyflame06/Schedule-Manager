@@ -414,7 +414,17 @@ export const db = {
       setLocalStorage("db_google_integration", newCredential);
       return newCredential;
     }
-    const { data, error } = await supabase
+
+    let client = supabase;
+    if (typeof window === "undefined") {
+      const { getSupabaseAdmin } = await import("./supabase/admin");
+      const adminClient = getSupabaseAdmin();
+      if (adminClient) {
+        client = adminClient;
+      }
+    }
+
+    const { data, error } = await client
       .from("integrations")
       .upsert({
         user_id: credential.user_id,
