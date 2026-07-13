@@ -207,7 +207,10 @@ export default function BookingPage() {
         return currentUtc < busyEnd && currentEndUtc > busyStart;
       });
 
-      if (!hasConflict && !hasGoogleConflict) {
+      // Skip slots that are in the past
+      const isPast = currentUtc.getTime() < Date.now();
+
+      if (!isPast && !hasConflict && !hasGoogleConflict) {
         slots.push(timeString);
       }
 
