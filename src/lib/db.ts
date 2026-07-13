@@ -432,7 +432,7 @@ export const db = {
         access_token: credential.access_token,
         refresh_token: credential.refresh_token,
         expires_at: credential.expires_at ?? null,
-      })
+      }, { onConflict: "user_id,provider" })
       .select()
       .single();
     if (error) throw error;
