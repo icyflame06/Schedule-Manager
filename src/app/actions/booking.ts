@@ -1,7 +1,7 @@
 "use server";
 
 import { unstable_noStore as noStore } from "next/cache";
-import { Booking, MeetingType } from "@/types";
+import { Availability, Booking, MeetingType } from "@/types";
 import { createGoogleCalendarEvent, getGoogleCalendarBusySlots, deleteGoogleCalendarEvent } from "@/lib/google/calendar";
 
 import { BookingSchema } from "@/lib/validations";
@@ -80,6 +80,40 @@ export async function fetchHostBookings(
     return data || [];
   } catch (error) {
     console.error("[Bookings] Error fetching host bookings:", error);
+    return [];
+  }
+}
+
+/**
+ * Fetch availability for a host user, bypassing RLS so unauthenticated guests
+ * can see which days/times the host is available.
+ */
+export async function fetchHostAvailability(
+  hostUserId: string
+): Promise<Availability[]> {
+  noStore();
+  try {
+    const { getSupabaseAdmin } = await import("@/lib/supabase/admin");
+    const admin = getSupabaseAdmin();
+    if (!admin) {
+      console.warn("[Availability] No admin client available");
+      return [];
+    }
+
+    const { data, error } = await admin
+      .from("availability")
+      .select("*")
+      .eq("user_id", hostUserId)
+      .order("day_of_week");
+
+    if (error) {
+      console.error("[Availability] Failed to fetch:", error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error("[Availability] Error fetching:", error);
     return [];
   }
 }

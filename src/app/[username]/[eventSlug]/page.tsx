@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Profile, MeetingType, Availability, Booking } from "@/types";
 import { db } from "@/lib/db";
-import { processGoogleBooking, fetchGoogleCalendarBusySlots, fetchHostBookings } from "@/app/actions/booking";
+import { processGoogleBooking, fetchGoogleCalendarBusySlots, fetchHostBookings, fetchHostAvailability } from "@/app/actions/booking";
 import { sendBookingConfirmationEmails } from "@/app/actions/email";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -85,7 +85,7 @@ export default function BookingPage() {
           setMeetingType(response.meetingType);
 
           const [availData, bkData] = await Promise.all([
-            db.getAvailability(response.profile.id),
+            fetchHostAvailability(response.profile.id),
             fetchHostBookings(response.profile.id),
           ]);
           setAvailabilities(availData);
@@ -190,7 +190,6 @@ export default function BookingPage() {
 
       const hasConflict = existingBookings.some((bk) => {
         if (bk.status !== "scheduled") return false;
-        if (bk.google_event_id && googleBusySlots.length > 0) return false;
         const bkStart = new Date(bk.start_time);
         const bkEnd = new Date(bk.end_time);
         return currentUtc < bkEnd && currentEndUtc > bkStart;
