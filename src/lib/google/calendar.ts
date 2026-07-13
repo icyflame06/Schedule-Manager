@@ -166,6 +166,7 @@ export async function createGoogleCalendarEvent(
     const eventBody: any = {
       summary: `${meetingType.title}: ${booking.guest_name}`,
       description: `Scheduled via Palsa.\n\nGuest Notes: ${booking.guest_notes || "None"}`,
+      location: meetingType.meeting_link || undefined,
       start: {
         dateTime: booking.start_time,
         timeZone: booking.timezone || "UTC",
