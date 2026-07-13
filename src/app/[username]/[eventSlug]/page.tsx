@@ -319,7 +319,7 @@ export default function BookingPage() {
               </span>
             </div>
             <div className="flex justify-between border-b border-slate-200 pb-2">
-              <span className="text-slate-500">Location:</span>
+              <span className="text-slate-500">Link:</span>
               <span className="font-semibold text-slate-900 text-right">
                 {meetingType.location_type === "google_meet" ? (
                   "Google Meet Link"
