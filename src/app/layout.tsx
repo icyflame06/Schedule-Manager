@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Premium Scheduling Platform",
+  title: "Palsa",
   description: "Schedule your meetings in a beautifully designed glassmorphic interface.",
   icons: {
     icon: "/palsa png logo_200 px.png",
