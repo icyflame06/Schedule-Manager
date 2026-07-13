@@ -26,7 +26,7 @@ function guestEmailHtml(
   meetingType: MeetingType,
   host: Profile
 ) {
-  const start = formatDateTime(booking.start_time, booking.timezone);
+  const start = formatDateTime(booking.start_time, "Asia/Kolkata");
   const meetLinkBlock = booking.meet_link
     ? `<a href="${booking.meet_link}" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#4f46e5;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">Join Google Meet</a>`
     : "";
@@ -91,7 +91,7 @@ function hostEmailHtml(
   meetingType: MeetingType,
   host: Profile
 ) {
-  const start = formatDateTime(booking.start_time, host.timezone);
+  const start = formatDateTime(booking.start_time, "Asia/Kolkata");
   const meetLinkBlock = booking.meet_link
     ? `<a href="${booking.meet_link}" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#4f46e5;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">Join Google Meet</a>`
     : "";

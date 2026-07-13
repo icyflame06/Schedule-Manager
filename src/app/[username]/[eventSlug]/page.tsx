@@ -54,7 +54,7 @@ export default function BookingPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [guestTimezone, setGuestTimezone] = useState("UTC");
+  const [guestTimezone, setGuestTimezone] = useState("Asia/Kolkata");
 
   // Booking Form State
   const [guestName, setGuestName] = useState("");
@@ -74,10 +74,8 @@ export default function BookingPage() {
   }, [loggedInUser]);
 
   useEffect(() => {
-    // Detect browser timezone
-    if (typeof window !== "undefined") {
-      setGuestTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC");
-    }
+    // Hardcode timezone to IST for all users
+    setGuestTimezone("Asia/Kolkata");
 
     async function loadData() {
       if (username && eventSlug) {
@@ -162,69 +160,55 @@ export default function BookingPage() {
 
   // --- TIME SLOTS GENERATION ---
   const generateTimeSlotsForDate = (date: Date) => {
+    // Assume `date` represents the intended day in Asia/Kolkata
+    const dayOfWeek = date.getDay();
+    const dayAvail = availabilities.find((a) => a.day_of_week === dayOfWeek);
+    if (!dayAvail) return [];
+
     const slots: string[] = [];
+    const [startH, startM] = dayAvail.start_time.split(":").map(Number);
+    const [endH, endM] = dayAvail.end_time.split(":").map(Number);
+    
     const effectiveDuration = isCustomDuration && customDuration ? Number(customDuration) : meetingType.duration;
     const duration = effectiveDuration;
-    
-    const guestStartOfDay = startOfDay(date);
-    const scanStartUtc = new Date(guestStartOfDay.getTime() - 24 * 60 * 60 * 1000);
-    const scanEndUtc = new Date(guestStartOfDay.getTime() + 48 * 60 * 60 * 1000);
 
-    const hostTz = profile.timezone || "UTC";
-    const hostStart = toZonedTime(scanStartUtc, hostTz);
-    const hostEnd = toZonedTime(scanEndUtc, hostTz);
-    
-    let currentHostDay = startOfDay(hostStart);
-    
-    while (currentHostDay <= hostEnd) {
-      const dayOfWeek = currentHostDay.getDay();
-      const dayAvail = availabilities.find((a) => a.day_of_week === dayOfWeek);
-      
-      if (dayAvail) {
-        const [startH, startM] = dayAvail.start_time.split(":").map(Number);
-        const [endH, endM] = dayAvail.end_time.split(":").map(Number);
-        
-        const slotStartTimeHost = new Date(currentHostDay);
-        slotStartTimeHost.setHours(startH, startM, 0, 0);
-        
-        const slotEndTimeHost = new Date(currentHostDay);
-        slotEndTimeHost.setHours(endH, endM, 0, 0);
-        
-        const slotStartUtc = fromZonedTime(slotStartTimeHost, hostTz);
-        const slotEndUtc = fromZonedTime(slotEndTimeHost, hostTz);
-        
-        let currentSlotUtc = slotStartUtc;
-        
-        while (currentSlotUtc.getTime() + duration * 60 * 1000 <= slotEndUtc.getTime()) {
-          const currentSlotEndUtc = new Date(currentSlotUtc.getTime() + duration * 60 * 1000);
-          
-          if (isSameDay(currentSlotUtc, date)) {
-            const timeString = format(currentSlotUtc, "HH:mm");
-            
-            const hasConflict = existingBookings.some((bk) => {
-              if (bk.status !== "scheduled") return false;
-              if (bk.google_event_id && googleBusySlots.length > 0) return false;
-              const bkStart = new Date(bk.start_time);
-              const bkEnd = new Date(bk.end_time);
-              return currentSlotUtc < bkEnd && currentSlotEndUtc > bkStart;
-            });
+    let current = new Date(date);
+    current.setHours(startH, startM, 0, 0);
 
-            const hasGoogleConflict = googleBusySlots.some((slot) => {
-              const busyStart = new Date(slot.start);
-              const busyEnd = new Date(slot.end);
-              return currentSlotUtc < busyEnd && currentSlotEndUtc > busyStart;
-            });
+    const endLimit = new Date(date);
+    endLimit.setHours(endH, endM, 0, 0);
 
-            if (!hasConflict && !hasGoogleConflict) {
-              slots.push(timeString);
-            }
-          }
-          currentSlotUtc = currentSlotEndUtc;
-        }
+    const dateString = format(date, "yyyy-MM-dd");
+
+    while (current.getTime() + duration * 60 * 1000 <= endLimit.getTime()) {
+      const timeString = format(current, "HH:mm");
+      const localTimeString = format(current, "HH:mm:ss");
+
+      // Calculate absolute UTC time assuming the slot is in Asia/Kolkata
+      const currentUtc = fromZonedTime(`${dateString}T${localTimeString}`, "Asia/Kolkata");
+      const currentEndUtc = new Date(currentUtc.getTime() + duration * 60 * 1000);
+
+      const hasConflict = existingBookings.some((bk) => {
+        if (bk.status !== "scheduled") return false;
+        if (bk.google_event_id && googleBusySlots.length > 0) return false;
+        const bkStart = new Date(bk.start_time);
+        const bkEnd = new Date(bk.end_time);
+        return currentUtc < bkEnd && currentEndUtc > bkStart;
+      });
+
+      const hasGoogleConflict = googleBusySlots.some((slot) => {
+        const busyStart = new Date(slot.start);
+        const busyEnd = new Date(slot.end);
+        return currentUtc < busyEnd && currentEndUtc > busyStart;
+      });
+
+      if (!hasConflict && !hasGoogleConflict) {
+        slots.push(timeString);
       }
-      currentHostDay = new Date(currentHostDay.getTime() + 24 * 60 * 60 * 1000);
+
+      current = new Date(current.getTime() + duration * 60 * 1000);
     }
-    
+
     return slots;
   };
 
@@ -238,14 +222,17 @@ export default function BookingPage() {
     setSubmitting(true);
 
     try {
-      // Find the absolute UTC time of the selected slot by matching the format back to the generated slot
-      // We know `selectedDate` and `selectedTime` (which is in local timezone)
       const [h, m] = selectedTime.split(":").map(Number);
-      const start = new Date(selectedDate);
-      start.setHours(h, m, 0, 0);
       
-      const start_time = start.toISOString();
-      const end_time = new Date(start.getTime() + duration * 60 * 1000).toISOString();
+      const dateString = format(selectedDate, "yyyy-MM-dd");
+      const timeString = `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:00`;
+      
+      const startUtc = fromZonedTime(`${dateString}T${timeString}`, "Asia/Kolkata");
+      
+      const effectiveDuration = isCustomDuration && customDuration ? Number(customDuration) : meetingType.duration;
+      
+      const start_time = startUtc.toISOString();
+      const end_time = new Date(startUtc.getTime() + effectiveDuration * 60 * 1000).toISOString();
 
       // Try to create Google Calendar event (non-fatal — booking still saves if this fails)
       let googleEventResult: { eventId?: string; meetLink?: string } | null = null;
@@ -483,7 +470,7 @@ export default function BookingPage() {
 
             <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-6 pl-0.5">
               <Globe className="w-3.5 h-3.5" />
-              <span>{guestTimezone} Timezone</span>
+              <span>Asia/Kolkata (IST) Timezone</span>
             </div>
           </div>
 
