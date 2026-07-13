@@ -98,6 +98,7 @@ export default function BookingPage() {
   }, [username, eventSlug]);
 
   const [googleBusySlots, setGoogleBusySlots] = useState<{ start: string; end: string }[]>([]);
+  const [googleCalendarConnected, setGoogleCalendarConnected] = useState(false);
 
   useEffect(() => {
     async function refreshSlotData() {
@@ -111,6 +112,7 @@ export default function BookingPage() {
         ]);
 
         setGoogleBusySlots(busy);
+        setGoogleCalendarConnected(true);
         setExistingBookings(freshBookings);
       }
     }
@@ -194,8 +196,12 @@ export default function BookingPage() {
       const currentUtc = fromZonedTime(`${dateString}T${localTimeString}`, "Asia/Kolkata");
       const currentEndUtc = new Date(currentUtc.getTime() + duration * 60 * 1000);
 
+      // Check Supabase bookings for conflicts.
+      // If Google Calendar is connected, skip bookings that were synced to Google
+      // (Google Calendar is the source of truth for those — if deleted from GCal, the slot frees up)
       const hasConflict = existingBookings.some((bk) => {
         if (bk.status !== "scheduled") return false;
+        if (googleCalendarConnected && bk.google_event_id) return false;
         const bkStart = new Date(bk.start_time);
         const bkEnd = new Date(bk.end_time);
         return currentUtc < bkEnd && currentEndUtc > bkStart;
