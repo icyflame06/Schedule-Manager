@@ -33,7 +33,7 @@ export default function AdminLoginPage() {
     const { error } = await signInWithEmail(email, password, "/dashboard");
     
     if (error) {
-      setErrorMsg(error.message);
+      setErrorMsg("asli rup se aao admin");
       setSigningIn(false);
     }
   };
