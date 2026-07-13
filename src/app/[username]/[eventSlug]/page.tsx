@@ -100,19 +100,25 @@ export default function BookingPage() {
   const [googleBusySlots, setGoogleBusySlots] = useState<{ start: string; end: string }[]>([]);
 
   useEffect(() => {
-    async function loadGoogleBusy() {
+    async function refreshSlotData() {
       if (profile) {
         const timeMin = startOfMonth(currentMonth).toISOString();
         const timeMax = endOfMonth(currentMonth).toISOString();
-        const busy = await fetchGoogleCalendarBusySlots(profile.id, timeMin, timeMax);
+
+        const [busy, freshBookings] = await Promise.all([
+          fetchGoogleCalendarBusySlots(profile.id, timeMin, timeMax),
+          fetchHostBookings(profile.id),
+        ]);
+
         setGoogleBusySlots(busy);
+        setExistingBookings(freshBookings);
       }
     }
 
-    loadGoogleBusy();
+    refreshSlotData();
 
-    // Auto-refresh every 60 seconds so host calendar changes are reflected in real-time
-    const interval = setInterval(loadGoogleBusy, 60_000);
+    // Auto-refresh every 30 seconds so calendar changes are reflected quickly
+    const interval = setInterval(refreshSlotData, 30_000);
     return () => clearInterval(interval);
   }, [profile, currentMonth]);
 
